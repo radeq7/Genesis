@@ -10,16 +10,16 @@ $config->setConfig('app_production', 0);
 $config->setConfig('app_directory', '');
 
 // nazwa aplikacji
-$config->setConfig('app_name', 'Genix3');
+$config->setConfig('app_name', 'Genesis framework');
 
 // adres bazy danych
-$config->setConfig('db_adres', 'mysql:host=s8.masternet.pl;dbname=radeq-g3test;charset=UTF8');
+$config->setConfig('db_adres', '');
 
 // użytkownik bazy danych
-$config->setConfig('db_user', 'radeq');
+$config->setConfig('db_user', '');
 
 // hasło bazy danych
-$config->setConfig('db_pass', 'LcLTzRFIbc31Xkiy4YvA');
+$config->setConfig('db_pass', '');
 
 // strona do logowania
 $config->setConfig('login_site', '/');
