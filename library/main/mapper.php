@@ -44,18 +44,18 @@ class mapper {
 			if ($new != $model)
 				$new_new[] = $new;
 		}
-		$self->$new = $new_new;
+		$self->new = $new_new;
 	}
 	
 	static function get_model(model $model) {
 		$self = mapper::instance();
-		if (isset($self->all[mapper::generete_name($model)]))
+		if (isset($self->all[mapper::generete_name($model)])) 
 			return $self->all[mapper::generete_name($model)];
-		else
+		else 
 			return $model->doLoad();
 	}
 
-	private function generete_name(model $model) {
+	static private function generete_name(model $model) {
 		return sprintf('%s%d', $model->get_name(), $model->get_id());
 	}
 
@@ -77,7 +77,7 @@ class mapper {
 	static function load(model $model) {
 		$self = mapper::instance();
 		$query = sprintf("SELECT * FROM `%s` WHERE `%s`='%d' LIMIT 1", $model->get_name(), $model->get_id_name(), $model->get_id());
-		echo $query;
+		printf('<br>%s',$query); // TEST
 		$result = $self->pdo->query($query);
 		$self->all[mapper::generete_name($model)] = $model;
 		if (!($wynik = $result->fetch(PDO::FETCH_ASSOC))) 
@@ -97,7 +97,7 @@ class mapper {
 			}
 		}
 		$query = sprintf("INSERT INTO `%s` (%s) VALUES (%s)", $model->get_name(), rtrim($query1, ', '), rtrim($query2, ', '));
-		printf('<br>%s',$query);
+		printf('<br>%s',$query); // TEST
 		if (!($self->pdo->exec($query))) {
 			$error = $self->pdo->errorInfo();
 			throw new Exception($error[2]);
@@ -106,9 +106,27 @@ class mapper {
 		return $self->pdo->lastInsertId();
 	}
 
+	/**
+	 * Zwraca tablicę wyszukiwanych dancyh w podanej tabeli.
+	 * 
+	 * @return array:
+	 */
+	static function select_by_where($table, $where, $select) {
+		
+		$self = mapper::instance();
+		$query = sprintf("SELECT %s FROM `%s` WHERE %s", $select, $table, $where);
+		$result = $self->pdo->query($query);
+		if ($result == FALSE) {
+			$error_message = $self->pdo->errorInfo();
+			throw new Exception($error_message[2]);
+		}
+		$wynik = $result->fetchAll(PDO::FETCH_ASSOC);	
+		return $wynik;
+	}
+	
 	private function delete(model $model) {
 		$query = sprintf("DELETE FROM `%s` WHERE `%s`='%d' LIMIT 1", $model->get_name(), $model->get_id_name(), $model->get_id());
-		printf('<br>%s',$query);
+		printf('<br>%s',$query); // TEST
 		$this->pdo->exec($query);
 	}
 
@@ -118,7 +136,7 @@ class mapper {
 			$query1 .= sprintf("`%s` = '%s', ", $key, $value);
 		}
 		$query = sprintf("UPDATE `%s` SET %s WHERE `%s`='%d' LIMIT 1", $model->get_name(), rtrim($query1, ', '), $model->get_id_name(), $model->get_id());
-		printf('<br>%s',$query);
+		printf('<br>%s',$query); // TEST
 		$this->pdo->exec($query);
 	}
 }

@@ -4,6 +4,7 @@ class view {
 	protected $title = '';
 	protected $style = array('style.css');
 	protected $script = array();
+	protected $if_view_layout = false;
 	
 	function __construct($view_path) {
 		$this->view = $view_path;
@@ -13,10 +14,6 @@ class view {
 	function init() {
 		$config = config_app::getInstance();
 		$this->title = $config->getConfig('app_name');
-	}
-	
-	function render_view() {
-		include BASE_PATH . 'application/view/layout.php';
 	}
 	
 	function set_title($title) {
@@ -33,5 +30,17 @@ class view {
 	
 	function get_content() {
 		return $this->view;
+	}
+	
+	function render_view() {
+		if (!$this->if_view_layout) {
+			include BASE_PATH . 'application/view/layout.php';
+			$this->if_view_layout = true;
+		}
+	}
+	
+	function render($view) {
+		$this->render_view();
+		include BASE_PATH . 'application/view/' . $view;
 	}
 }

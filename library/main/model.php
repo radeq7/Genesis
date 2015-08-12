@@ -1,19 +1,25 @@
 <?php
 abstract class model {
 	private $id = 0;
-	protected $id_name = '';
+	protected $id_name = 'id';
 	protected $name = '';
 	protected $table = array();
 	protected $change = array();
-
-	function __construct($id = 0) {
-		if ($id) {
-			$this->id = $id;
-			mapper::get_model($this);
-		}
-		else
-			$this->add_new();
+	
+	protected function __construct($id){
 	}
+	
+	static function load($id = 0) {
+		$object = new static($id);
+		if ($id) {
+			$object->id = $id;
+			return mapper::get_model($object);
+		}
+		else {
+			$this->add_new();
+			return $object;
+		}
+	} 
 
 	function doCreate() {
 		$this->id = mapper::create($this);
@@ -21,6 +27,7 @@ abstract class model {
 	
 	function doLoad() {
 		$this->table = mapper::load($this);
+		return $this;
 	}
 	
 	function get_id() {
@@ -44,7 +51,6 @@ abstract class model {
 		foreach ($this->change as $change) {
 			$tmp[$change] = $this->table[$change];
 		}
-		print_r($tmp); //TEST
 		return $tmp;
 	}
 

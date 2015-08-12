@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Główny rdzeń aplikacji.
+ * Zadanie tej klasy to Inicjalizacja aplikacji poprzez załadowanie wymaganych plików
+ * oraz uruchomienie odpowiedniego kontrolera.
+ * @package Genesis
+ */
 class application {
 	
 	static private $instance;
@@ -22,8 +28,26 @@ class application {
 		require_once BASE_PATH . 'library/main/controller.php';
 		require_once BASE_PATH . 'library/main/view.php';
 		require_once BASE_PATH . 'library/main/mapper.php';
+		require_once BASE_PATH . 'library/main/model.php';
 		require_once BASE_PATH . 'library/main/database.php';
 		require_once BASE_PATH . 'application/configs/app_config.php';
+		
+		// Wyświetlanie błędów
+		$config = config_app::getInstance();
+		if ($config->getConfig('app_production')) {
+			ini_set('display_errors', '0');
+			error_reporting(E_ALL);
+		}
+		else {
+			ini_set('display_errors', '1');
+			error_reporting(E_ALL);
+		}
+		
+		// Ustawienie języka
+		$_SESSION['lang'] = 'en';
+		
+		// Ustawienie id użytkownika
+		$_SESSION['id_user'] = 0;
 	}
 	
 	function run() {
@@ -44,7 +68,7 @@ class application {
 		mapper::execute();
 		
 	}
-	
+
 	function execute(Controller $controller) {
 		
 		// inicjalizacja kontrolera
