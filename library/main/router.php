@@ -47,7 +47,7 @@ class library_main_router {
 	 */
 	protected function get_controller_name(library_main_request $request) { 
 		
-		// sprawdź czy kontroler istnieje
+		// sprawdź czy plik kontrolera istnieje
 		if (file_exists($request->get_controller_path_by_name($request->get_controller_name())))
 			$controller_name = $request->get_controller_name();
 		
@@ -61,6 +61,7 @@ class library_main_router {
 	}
 	
 	protected function get_action_name($controller_name, library_main_request $request) {
+
 		if (method_exists($controller_name, $request->get_action_name()))
 			$action_name = $request->get_action_name();
 		else {

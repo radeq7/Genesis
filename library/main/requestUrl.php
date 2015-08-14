@@ -23,7 +23,7 @@ class library_main_requestUrl extends library_main_request {
 		
 		// podzielenie url na odpowiednie części i przypisanie do tablicy
 		$tablica = explode('/', $path);
-		
+
 		// odczyt tablicy
 		if ($tablica[0] != '') {
 			$this->controller_name = ucfirst($tablica[0]);

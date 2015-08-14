@@ -7,12 +7,12 @@ namespace Genesis;
  * @package Genesis
  */
 class library_main_request {
-	private $default_controller_name;
-	private $default_action_name;
-	private $error_controller_name;
-	private $controller_name = NULL;
-	private $action_name = NULL;
-	private $parameters = array();
+	protected $default_controller_name;
+	protected $default_action_name;
+	protected $error_controller_name;
+	protected $controller_name = NULL;
+	protected $action_name = NULL;
+	protected $parameters = array();
 	
 	function __construct($default_controller_name = 'Index', $default_action_name = 'index', $error_controller_name = 'Error') {
 		$this->default_controller_name = $default_controller_name;
@@ -26,17 +26,15 @@ class library_main_request {
 	}
 	
 	function get_controller_name() {
-		if (isset($this->controller_name))
-			return $this->controller_name . 'Controller';
-		else 
+		if(empty($this->controller_name))
 			return $this->default_controller_name . 'Controller';
+		return $this->controller_name . 'Controller';
 	}
 	
 	function get_action_name() {
-		if (isset($this->action_name))
-			return $this->action_name . 'Action';
-		else 
+		if(empty($this->action_name))
 			return $this->default_action_name . 'Action';
+		return $this->action_name . 'Action';
 	}
 	
 	function get_default_action_name() {
