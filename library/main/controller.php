@@ -1,30 +1,15 @@
 <?php
 
-abstract class Controller {
+class library_main_controller {
+	protected $parameters = array();
 	
-	protected $variable = array();
-	protected $param = array();
-	protected $view;
-	
-	function __construct($param, $view_path) {
-		$this->param = $param;
-		$this->view = new view($view_path);
+	function __construct($parameters) {
+		$this->parameters = $parameters;
 	}
 	
-	function init() {
-		
-	}
-		
-	function __set($param, $value) {
-		$this->variable[$param] = $value;
+	function init(){
 	}
 	
-	function __get($param) {
-		return $this->variable[$param];
+	function end(){
 	}
-		
-	function post() {
-		// wyświetlenie widoku
-		$this->view->render_view();
-	}
-} 
+}

@@ -1,86 +1,90 @@
 <?php
+namespace Genesis;
 
-class router {
-	
-	private $url = '';
-	private $controller_name = 'Index';
-	private $action_name ='index';
-	private $param = array();
+/**
+ * Sprawdza czy istnieje i uruchamia odpowiednią akcję kontrolera.
+ * Do działania trzeba przekazać obiekt typu request(żadanie) na podstawie którego tworzy i uruchamia odpowiedni kontroler.
+ * 
+ * @package Genesis
+ */
+class library_main_router {
 	
 	function __construct() {
-		self::read_url();
-		self::read_param();
 	}
 	
-	private function read_url() {
-		$this->url = parse_url($_SERVER['REQUEST_URI']);
-		$config = config_app::getInstance();
+	function run(library_main_request $request) {
+		$this->run_request($request);
+	}
+	
+	protected function run_request(library_main_request $request) {
+
+		$controller_name = $this->get_controller_name($request);
 		
-		// odczytanie url i usunięcie znaków /
-		$path = trim($this->url['path'], '/');
+		// załadowanie pliku z kontrolerem
+		$this->load_controller_file($request->get_controller_path_by_name($controller_name));
 		
-		// usunięcie index.php i znaków / jeśli występują w url
-		$path = substr($path, strlen($config->getConfig('app_directory')));
-		if (strpos($path, 'index.php') === 0)
-			$path = trim (substr($path, 9), '/');
+		// sprawdź czy klasa kontrolera istnieje w podanym pliku
+		if (!class_exists($controller_name, false))
+			throw new \Exception("Klasa kontrolera nie została zdefiniowana w pliku kontrolera!");
 		
-		// podzielenie url na odpowiednie części i przypisanie do tablicy
-		$tablica = explode('/', $path);
+		// sprawdź czy akcja kontrolera istnieje i zwróć jej nazwę
+		$action_name = $this->get_action_name($controller_name, $request);
+				
+		// utworzenie obiektu controller
+		$controller = $this->create_controller($controller_name, $request->get_parameters());
 		
-		// odczyt tablicy
-		if ($tablica[0] != '') {
-			$this->controller_name = ucfirst($tablica[0]);
-			if (isset($tablica[1])) {
-				$this->action_name = $tablica[1];
-			}
+		// uruchomienie akcji controllera
+		$this->run_controller($controller, $action_name);
+	}
+
+	
+	/**
+	 * Sprawdza czy plik z kontrolerem istnieje
+	 * Jeśli plik z żądanym kontrolerem, ani plik z kontrolerem błedu nie istnieje zrzuca wyjątek
+	 * @param request $request
+	 * @throws \Exception
+	 * @return string nazwa istniejącego kontrolera
+	 */
+	protected function get_controller_name(library_main_request $request) { 
+		
+		// sprawdź czy kontroler istnieje
+		if (file_exists($request->get_controller_path_by_name($request->get_controller_name())))
+			$controller_name = $request->get_controller_name();
+		
+		else {
+			if (file_exists($request->get_controller_path_by_name($request->get_error_controller_name())))
+				$controller_name = $request->get_error_controller_name();
+			else
+				throw new \Exception("Kontroler błędu nie istnieje!");
 		}
+		return $controller_name;
 	}
 	
-	private function read_param() {
-		if (!isset($this->url['query']))
-			return;
-		$param = explode('&', $this->url['query']);	
-		for ($i = 0; $i < count($param); $i++) {
-			if (strpos($param[$i], '=') !== FALSE) {
-				$parametr = explode('=', $param[$i]);
-				$this->param[$parametr[0]] = $parametr[1];
-			}
+	protected function get_action_name($controller_name, library_main_request $request) {
+		if (method_exists($controller_name, $request->get_action_name()))
+			$action_name = $request->get_action_name();
+		else {
+			if (method_exists($controller_name, $request->get_default_action_name()))
+				$action_name = $request->get_default_action_name();
+			else
+				throw new \Exception("Domyślna akcja kontrolera: '$controller_name' nie istnieje!");
 		}
+		return $action_name;
 	}
 	
-	function get_controller_name() {
-		return $this->controller_name;
+	protected function create_controller($controller_name, $paremeters) {
+		$controller = new $controller_name($paremeters);
+		return $controller;
 	}
 	
-	function get_action_name() {
-		return $this->action_name;
-	}
-
-	function get_param() {
-		return $this->param;
-	}
-
-	function get_controller_path() {
-		return BASE_PATH . 'application/controller/' . $this->controller_name . 'Controller.php';
+	protected function load_controller_file($controller_path) {
+		require_once $controller_path; 		
 	}
 	
-	function get_view_path() {
-		return BASE_PATH . 'application/view/' . $this->controller_name . '/' . $this->action_name . '.php';
+	protected function run_controller(\library_main_controller $controller, $action_name) {
+		$controller->init();
+		$controller->$action_name();
+		$controller->end();
 	}
 	
-	function get_controller_name_class() {
-		return $this->controller_name . 'Controller';
-	}
-
-	function get_action_name_class() {
-		return $this->action_name . 'Action';
-	}
-	
-	function set_controller_name($controller_name) {
-		$this->controller_name = $controller_name;
-	}
-
-	function set_action_name($action_name) {
-		$this->action_name = $action_name;
-	}
 }

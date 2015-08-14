@@ -1,111 +1,44 @@
 <?php
+namespace Genesis;
 
 /**
  * Główny rdzeń aplikacji.
- * Zadanie tej klasy to Inicjalizacja aplikacji poprzez załadowanie wymaganych plików
- * oraz uruchomienie odpowiedniego kontrolera.
+ * Ładuje odpowiednie pliki aplikacji, 
+ * 
  * @package Genesis
  */
 class application {
 	
-	static private $instance;
-	private $request;
-	
-	private function __construct() {	
-	}
-	
-	static function instance() {
-		if (!self::$instance)
-			self::$instance = new application();
-			
-		return self::$instance;
+	function start() {
+		$this->init();
+		$this->run();
+		$this->end();
 	}
 	
 	function init() {
-		session_start();
+		// WYŚWIETLANIE BŁĘDÓW
+		ini_set('display_errors', '1');
+		error_reporting(E_ALL);
+		
+		//echo __NAMESPACE__;
 		require_once BASE_PATH . 'library/main/autoloader.php';
-		require_once BASE_PATH . 'library/main/router.php';
-		require_once BASE_PATH . 'library/main/controller.php';
-		require_once BASE_PATH . 'library/main/view.php';
-		require_once BASE_PATH . 'library/main/mapper.php';
-		require_once BASE_PATH . 'library/main/model.php';
-		require_once BASE_PATH . 'library/main/database.php';
-		require_once BASE_PATH . 'application/configs/app_config.php';
 		
-		// Wyświetlanie błędów
-		$config = config_app::getInstance();
-		if ($config->getConfig('app_production')) {
-			ini_set('display_errors', '0');
-			error_reporting(E_ALL);
-		}
-		else {
-			ini_set('display_errors', '1');
-			error_reporting(E_ALL);
-		}
-		
-		// Ustawienie języka
-		$_SESSION['lang'] = 'en';
-		
-		// Ustawienie id użytkownika
-		$_SESSION['id_user'] = 0;
+
 	}
 	
 	function run() {
+		// utworzenie obiektu request
+		//require_once BASE_PATH . 'library/main/request.php';
+		//require_once BASE_PATH . 'library/main/requestUrl.php';
 		
-		// inicjalizacja aplikacji
-		$this->init();
+		$request = new library_main_requestUrl();
 		
-		// rozpoznanie żądania po adresie url
-		$this->request = new router();
-		
-		// stworzenie kontrolera na podstawie żądania
-		$controller = $this->getController();
-		
-		// wykonanie polecenia
-		$this->execute($controller);		
-		
-		// wykonanie aktualizacji bazy danych
-		mapper::execute();
-		
-	}
-
-	function execute(Controller $controller) {
-		
-		// inicjalizacja kontrolera
-		$controller->init();
-		
-		// uruchomienie akcji kontrolera
-		$action_name = $this->request->get_action_name_class();
-		$controller->$action_name();
-		
-		// uruchomienie zakmnięcia kontrolera
-		$controller->post();
+		// uruchomienie routera z przekazanym obiektem request
+		$router = new library_main_router();
+		$router->run($request);
 	}
 	
-	function getController() {
-				
-		// Sprawdzenie czy podany controler istnieje
-		if (!file_exists($this->request->get_controller_path())) 
-			$this->request->set_controller_name('Error');				
-		
-		// załadowanie pliku controlera
-		require_once $this->request->get_controller_path();
-		
-		// Sprawdzenie czy podana akcja istnieje
-		if (!method_exists($this->request->get_controller_name_class(), $this->request->get_action_name_class())) 		
-			$this->request->set_action_name('index');
-							
-		$view_path = BASE_PATH . 'application/view/' . $this->request->get_controller_name() . '/' . $this->request->get_action_name() . '.php';
-		$controller_name = $this->request->get_controller_name_class();
-		$controller = new $controller_name($this->request->get_param(), $view_path);
-		return $controller;
-	}
-	
-	static function redirect($redirect, $type=NULL) {
-		if ($type == 'LOGIN') {
-			$config = config_app::getInstance();
-			$redirect = $config->getConfig('login_site');
-		}
-		printf('<meta http-equiv="refresh" content="0;url=%s">', $redirect);
+	function end() {
+		// czynności końcowe aplikacji
 	}
 }
