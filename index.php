@@ -1,5 +1,4 @@
 <?php
-namespace Genesis;
 
 define("BASE_PATH", dirname(__FILE__) . '/');
 require_once 'library/main/application.php';
@@ -9,6 +8,6 @@ try {
 	$application = new application();
 	$application->start();
 }
-catch (\Exception $error) {
+catch (Exception $error) {
 	echo $error->getMessage();
 }

@@ -1,5 +1,4 @@
 <?php
-namespace Genesis;
 
 /**
  * Pobiera i przechowuje informacje o żądaniu od użytkownika.

@@ -1,5 +1,4 @@
 <?php
-namespace Genesis;
 
 /**
  * Sprawdza czy istnieje i uruchamia odpowiednią akcję kontrolera.
@@ -22,7 +21,7 @@ class library_main_router {
 		
 		// załadowanie pliku z kontrolerem
 		$this->load_controller_file($request->get_controller_path_by_name($controller_name));
-		
+
 		// sprawdź czy klasa kontrolera istnieje w podanym pliku
 		if (!class_exists($controller_name, false))
 			throw new \Exception("Klasa kontrolera nie została zdefiniowana w pliku kontrolera!");

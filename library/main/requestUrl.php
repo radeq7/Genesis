@@ -1,5 +1,4 @@
 <?php
-namespace Genesis;
 
 /**
  * Pobiera żądanie od użytkownika poprzez adres url

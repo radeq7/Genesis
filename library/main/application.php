@@ -1,5 +1,4 @@
 <?php
-namespace Genesis;
 
 /**
  * Główny rdzeń aplikacji.
@@ -16,16 +15,17 @@ class application {
 	}
 	
 	function init() {
-		// WYŚWIETLANIE BŁĘDÓW
-		ini_set('display_errors', '1');
-		error_reporting(E_ALL);
-		
-		//echo __NAMESPACE__;
+		//załadowanie autoloadera;
 		require_once BASE_PATH . 'library/main/autoloader.php';
 		
 		// wczytanie konfiguracji aplikacji
+		ini_set('display_errors', '1');
 		require_once BASE_PATH . 'library/config.php';
-
+		
+		// WYŚWIETLANIE BŁĘDÓW
+		$this->error_switch(library_main_appConfig::getConfig('error'));
+		
+		
 	}
 	
 	function run() {
@@ -39,5 +39,14 @@ class application {
 	
 	function end() {
 		// czynności końcowe aplikacji
+	}
+	
+	function error_switch($error) {
+		if ($error){
+			ini_set('display_errors', '1');
+			error_reporting(E_ALL);
+		}
+		else 
+			ini_set('display_errors', '0');
 	}
 }
