@@ -23,13 +23,12 @@ class application {
 		//echo __NAMESPACE__;
 		require_once BASE_PATH . 'library/main/autoloader.php';
 		
+		// wczytanie konfiguracji aplikacji
+		require_once BASE_PATH . 'library/config.php';
 
 	}
 	
 	function run() {
-		// utworzenie obiektu request
-		//require_once BASE_PATH . 'library/main/request.php';
-		//require_once BASE_PATH . 'library/main/requestUrl.php';
 		
 		$request = new library_main_requestUrl();
 		

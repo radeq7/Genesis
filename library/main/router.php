@@ -30,8 +30,11 @@ class library_main_router {
 		// sprawdź czy akcja kontrolera istnieje i zwróć jej nazwę
 		$action_name = $this->get_action_name($controller_name, $request);
 				
+		// utworzenie widoku
+		$view = $this->create_view($controller_name, $action_name);
+		
 		// utworzenie obiektu controller
-		$controller = $this->create_controller($controller_name, $request->get_parameters());
+		$controller = $this->create_controller($controller_name, $request->get_parameters(), $view);
 		
 		// uruchomienie akcji controllera
 		$this->run_controller($controller, $action_name);
@@ -73,9 +76,15 @@ class library_main_router {
 		return $action_name;
 	}
 	
-	protected function create_controller($controller_name, $paremeters) {
-		$controller = new $controller_name($paremeters);
+	protected function create_controller($controller_name, $paremeters, $view_name) {
+		$controller = new $controller_name($paremeters, $view_name);
 		return $controller;
+	}
+	
+	protected function create_view($controller_name, $action_name) {
+		$view_name = substr($controller_name, 0, -10) . '/' . substr($action_name, 0, -6) . '.php';  
+		$view = new \library_main_view($view_name);
+		return $view;
 	}
 	
 	protected function load_controller_file($controller_path) {

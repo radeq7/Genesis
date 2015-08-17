@@ -19,6 +19,10 @@ class library_main_request {
 		$this->default_action_name = $default_action_name;
 		$this->error_controller_name = $error_controller_name;
 		$this->parse();
+		if(empty($this->controller_name))
+			$this->controller_name = $this->default_controller_name;
+		if(empty($this->action_name))
+			$this->action_name = $this->default_action_name;
 	}
 	
 	protected function parse() {
@@ -26,14 +30,10 @@ class library_main_request {
 	}
 	
 	function get_controller_name() {
-		if(empty($this->controller_name))
-			return $this->default_controller_name . 'Controller';
 		return $this->controller_name . 'Controller';
 	}
 	
 	function get_action_name() {
-		if(empty($this->action_name))
-			return $this->default_action_name . 'Action';
 		return $this->action_name . 'Action';
 	}
 	
@@ -52,5 +52,7 @@ class library_main_request {
 	function get_controller_path_by_name($controller_name) {
 		return BASE_PATH . 'controller/' . $controller_name . '.php';
 	}
+	
+
 	
 }
