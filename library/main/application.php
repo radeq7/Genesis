@@ -39,6 +39,7 @@ class application {
 	
 	function end() {
 		// czynności końcowe aplikacji
+		library_main_objectWatcher::execute();
 	}
 	
 	function error_switch($error) {
