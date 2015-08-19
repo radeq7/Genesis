@@ -15,5 +15,6 @@
 	
 <body>
 <?php $this->render_view();?>
+
 </body>
 </html>	

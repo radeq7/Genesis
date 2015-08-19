@@ -96,4 +96,11 @@ class library_main_router {
 		$controller->end();
 	}
 	
+	static function redirect($redirect, $type=NULL) {
+		if ($type == 'LOGIN') {
+			$redirect = library_main_appConfig::getConfig('login_site');
+		}
+		header('Location: '.$redirect);
+		exit();
+	}
 }
