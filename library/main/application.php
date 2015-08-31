@@ -15,6 +15,8 @@ class application {
 	}
 	
 	function init() {
+		session_start();
+		
 		//załadowanie autoloadera;
 		require_once BASE_PATH . 'library/main/autoloader.php';
 		
@@ -37,7 +39,7 @@ class application {
 		$router->run($request);
 	}
 	
-	function end() {
+	static function end() {
 		// czynności końcowe aplikacji
 		library_main_objectWatcher::execute();
 	}

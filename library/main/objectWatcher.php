@@ -35,7 +35,7 @@ abstract class library_main_objectWatcher {
 		if (isset(self::$all[library_main_objectWatcher::generete_name($model)]))
 			return self::$all[library_main_objectWatcher::generete_name($model)];
 		else {
-			$mapper = library_main_mapper::instance();
+			$mapper = library_main_mapperFactory::getMapper();
 			$data = $mapper->load($model);
 			self::$all[library_main_objectWatcher::generete_name($model)] = $model;
 			return $data;
@@ -47,7 +47,7 @@ abstract class library_main_objectWatcher {
 	}
 	
 	static function execute() {
-		$mapper = library_main_mapper::instance();
+		$mapper = library_main_mapperFactory::getMapper();
 		foreach (self::$new as $model) {
 			$mapper->insert($model);
 		}

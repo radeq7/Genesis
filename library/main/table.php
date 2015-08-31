@@ -1,6 +1,10 @@
 <?php
 
 abstract class library_main_table {
+	/**
+	 * Nazwa tabeli w bazie danych
+	 * @var string
+	 */
 	protected $table_name;
 	protected $id = 0;
 	protected $id_name = 'id';

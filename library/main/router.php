@@ -100,6 +100,7 @@ class library_main_router {
 		if ($type == 'LOGIN') {
 			$redirect = library_main_appConfig::getConfig('login_site');
 		}
+		application::end();
 		header('Location: '.$redirect);
 		exit();
 	}
