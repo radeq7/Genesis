@@ -7,15 +7,25 @@ abstract class library_main_table {
 	protected $values = array();
 	protected $change = array();
 	
-	function __construct($id = 0) {
-		if ($id == 0)
-			$this->add_new();
-		else {
-			$this->id = $id;
-			$this->values = library_main_objectWatcher::get_model($this);
-		}
+	/**Deleguje pobranie wartości z tabeli bazy danych i zapisuje je do tablicy $values
+	 * @param int $id nr id w tabeli bazy dancyh
+	 */
+	function load($id){
+		$this->id = $id;
+		$this->values = library_main_objectWatcher::get_model($this);
 	}
 	
+	/**Deleguje utworzenie nowego wiersza w tabeli bazy danych
+	 * 
+	 */
+	function create(){
+		library_main_objectWatcher::add_new($this);
+	}
+	
+	/**Ustawia parametr z wartością do zapisu w tabeli bazy danych
+	 * @param string $var nazwa parametru
+	 * @param mixed $value wartość parametru
+	 */
 	function set_var($var, $value){
 		$this->values[$var] = $value;
 		$this->change[$var] = $value;
@@ -23,24 +33,26 @@ abstract class library_main_table {
 			$this->dirty();
 	}
 	
+	/**Pobiera wartość parametru o podanej nazwie 
+	 * @param string $var
+	 * @return mixed
+	 */
 	function get_var($var){
 		return $this->values[$var];
 	}
 	
+	/**Oznacza obiekt, aby nie został zaktualizowany w bazie danych
+	 * 
+	 */
 	function clean(){
 		library_main_objectWatcher::clean($this);
 	}
 	
+	/**Oznacza obiekt, aby został usunięty z bazy danych
+	 * 
+	 */
 	function delete(){
 		library_main_objectWatcher::add_delete($this);
-	}
-	
-	protected function add_new(){
-		library_main_objectWatcher::add_new($this);
-	}
-	
-	protected function dirty(){
-		library_main_objectWatcher::add_dirty($this);
 	}
 	
 	function get_name(){
@@ -57,5 +69,9 @@ abstract class library_main_table {
 	
 	function get_change(){
 		return $this->change;
+	}
+	
+	protected function dirty(){
+		library_main_objectWatcher::add_dirty($this);
 	}
 }
