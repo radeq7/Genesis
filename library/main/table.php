@@ -8,15 +8,15 @@ abstract class library_main_table {
 	protected $table_name;
 	protected $id = 0;
 	protected $id_name = 'id';
-	protected $values = array();
+	protected $dbValues = array();
 	protected $change = array();
 	
-	/**Deleguje pobranie wartości z tabeli bazy danych i zapisuje je do tablicy $values
+	/**Deleguje pobranie wartości z tabeli bazy danych i zapisuje je do tablicy $dbValues
 	 * @param int $id nr id w tabeli bazy dancyh
 	 */
 	function load($id){
 		$this->id = $id;
-		$this->values = library_main_objectWatcher::get_model($this);
+		$this->dbValues = library_main_objectWatcher::get_model($this);
 	}
 	
 	/**Deleguje utworzenie nowego wiersza w tabeli bazy danych
@@ -30,8 +30,8 @@ abstract class library_main_table {
 	 * @param string $var nazwa parametru
 	 * @param mixed $value wartość parametru
 	 */
-	function set_var($var, $value){
-		$this->values[$var] = $value;
+	protected function set_var($var, $value){
+		$this->dbValues[$var] = $value;
 		$this->change[$var] = $value;
 		if ($this->id)
 			$this->dirty();
@@ -42,7 +42,7 @@ abstract class library_main_table {
 	 * @return mixed
 	 */
 	function get_var($var){
-		return $this->values[$var];
+		return $this->dbValues[$var];
 	}
 	
 	/**Oznacza obiekt, aby nie został zaktualizowany w bazie danych
