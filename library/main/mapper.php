@@ -80,4 +80,23 @@ class library_main_mapper {
 		$query = sprintf("DELETE FROM `%s` WHERE `%s`='%d' LIMIT 1", $model->get_name(), $model->get_id_name(), $model->get_id());
 		$this->pdo->exec($query);
 	}
+	
+	/**
+	 * Zapytanie do bazy danych
+	 * @param string $select
+	 * @param string $table
+	 * @param string $where
+	 * @throws Exception Gdy błąd bazy danych
+	 * @return array
+	 */
+	function fetchAllAssoc($select, $table, $where){
+		$query = sprintf("SELECT %s FROM `%s` WHERE %s", $select, $table, $where);
+		$result = $this->pdo->query($query);
+		if ($result == FALSE) {
+			$error_message = $self->pdo->errorInfo();
+			throw new Exception($error_message[2]);
+		}
+		$wynik = $result->fetchAll(PDO::FETCH_ASSOC);
+		return $wynik;
+	}
 }

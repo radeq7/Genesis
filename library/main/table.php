@@ -87,7 +87,7 @@ abstract class library_main_table {
 	/**
 	 * Oznacza obiekt, jako do aktualizacji
 	 */
-	protected function markDirty(){
+	protected function markSave(){
 		if ($this->id)
 			library_main_objectWatcher::add_dirty($this);
 	}
