@@ -9,14 +9,13 @@ class library_main_requestUrl extends library_main_request {
 	
 	protected function parse() {
 		$url = parse_url($_SERVER['REQUEST_URI']);
-		//$config = config_app::getInstance();
-		$config = ''; // W TO MIEJSCE NALEŻY ZAŁADOWAĆ Z KONFIGURACJI APP_DIRECTORY
+		$siteAdres = library_main_appConfig::getConfig('siteAdres');
 		
 		// read url and remove white signs
 		$path = trim($url['path'], '/');
 		
 		// remove 'index.php' and signs '/' in url
-		$path = substr($path, strlen($config));
+		$path = substr($path, strlen($siteAdres));
 		if (strpos($path, 'index.php') === 0)
 			$path = trim (substr($path, 9), '/');
 		

@@ -1,61 +1,103 @@
 <?php
 
+/**
+ * Buforuje obiekty odczytane z bazy danych 
+ * @author Radeq
+ */
 abstract class library_main_objectWatcher {
 	static private $all = array();
 	static private $dirty = array();
 	static private $new = array();
 	static private $delete = array();
 	
-	static function add_dirty(library_main_table $model) {
-		$name = library_main_objectWatcher::generete_name($model);
-		self::$dirty[$name] = $model;
+	/**
+	 * Dodaje do tabeli jako do aktualizacji
+	 * @param library_main_table $table
+	 */
+	static function add_dirty(library_main_table $table) {
+		$name = library_main_objectWatcher::generete_name($table);
+		self::$dirty[$name] = $table;
 	}
 	
-	static function add_new(library_main_table $model) {
-		self::$new[] = $model;
+	/**
+	 * Dodaje do tabeli obiekty do inserta bd
+	 * @param library_main_table $table
+	 */
+	static function add_new(library_main_table $table) {
+		self::$new[] = $table;
 	}
 	
-	static function add_delete(library_main_table $model) {
-		$name = library_main_objectWatcher::generete_name($model);
-		self::$delete[$name] = $model;
+	/**
+	 * Dodaje do tabeli do skasowania
+	 * @param library_main_table $table
+	 */
+	static function add_delete(library_main_table $table) {
+		$name = library_main_objectWatcher::generete_name($table);
+		self::$delete[$name] = $table;
 	}
 	
-	static function clean(library_main_table $model) {
-		unset(self::$dirty[library_main_objectWatcher::generete_name($model)]);
-		unset(self::$delete[library_main_objectWatcher::generete_name($model)]);
+	/**
+	 * Usuwa obiekt z tabel: aktualizacji, skasowania, stworzenia nowego
+	 * @param library_main_table $table
+	 */
+	static function clean(library_main_table $table) {
+		unset(self::$dirty[library_main_objectWatcher::generete_name($table)]);
+		unset(self::$delete[library_main_objectWatcher::generete_name($table)]);
 		$new_new = array();
 		foreach (self::$new as $new) {
-			if ($new != $model)
+			if ($new != $table)
 				$new_new[] = $new;
 		}
 		self::$new = $new_new;
 	}
 	
-	static function get_model(library_main_table $model) {
-		if (isset(self::$all[library_main_objectWatcher::generete_name($model)]))
-			return self::$all[library_main_objectWatcher::generete_name($model)];
+	/**
+	 * Odczytuje obiekt z tabeli jeśli był już wcześniej odczytany lub odczytuje teraz
+	 * @param library_main_table $table
+	 * @return library_main_table
+	 */
+	static function get_model(library_main_table $table) {
+		if (isset(self::$all[library_main_objectWatcher::generete_name($table)]))
+			return self::$all[library_main_objectWatcher::generete_name($table)];
 		else {
-			$mapper = library_main_mapperFactory::getMapper();
-			$data = $mapper->load($model);
-			self::$all[library_main_objectWatcher::generete_name($model)] = $model;
-			return $data;
+			return self::get_model_from_db($table);
 		}
 	}
 	
-	static private function generete_name(library_main_table $model) {
-		return sprintf('%s%d', $model->get_name(), $model->get_id());
+	/**
+	 * Odczytuje obiekt z bazy danych
+	 * @param library_main_table $table
+	 * @return library_main_table
+	 */
+	static private function get_model_from_db(library_main_table $table){
+		$mapper = library_main_mapperFactory::getMapper();
+		$table->load_variable($mapper->load($table));
+		self::$all[library_main_objectWatcher::generete_name($table)] = $table;
+		return $table;
 	}
 	
+	/**
+	 * Tworzy unikatową nazwę obiektu do identyfikacji
+	 * @param library_main_table $table
+	 * @return string
+	 */
+	static private function generete_name(library_main_table $table) {
+		return sprintf('%s%d', $table->get_name(), $table->get_id());
+	}
+	
+	/**
+	 * Wykonuje wszystkie operacje zaplanowane na bazie danych
+	 */
 	static function execute() {
 		$mapper = library_main_mapperFactory::getMapper();
-		foreach (self::$new as $model) {
-			$mapper->insert($model);
+		foreach (self::$new as $table) {
+			$mapper->insert($table);
 		}
-		foreach (self::$dirty as $model) {
-			$mapper->update($model);
+		foreach (self::$dirty as $table) {
+			$mapper->update($table);
 		}
-		foreach (self::$delete as $model) {
-			$mapper->delete($model);
+		foreach (self::$delete as $table) {
+			$mapper->delete($table);
 		}
 	}
 }

@@ -1,7 +1,10 @@
 <?php
 
+// adres strony
+library_main_appConfig::setConfig('siteAdres', 'my-site/Eclipse/GenesisFramework/');
+
 // tytuł aplikacji
-library_main_appConfig::setConfig('title', 'Genesis framework');
+library_main_appConfig::setConfig('title', 'Genesis Framework');
 
 // wyświetlanie błędów
 library_main_appConfig::setConfig('error', true);

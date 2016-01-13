@@ -36,6 +36,18 @@ class library_main_mapper {
 	}
 	
 	/**
+	 * Wykonuje polecenie sql lub zrzuca wyjątek z błedem sql
+	 * @param string $query
+	 * @throws Exception błąd bazy danych
+	 */
+	protected function pdo_exec_or_error($query){
+		if (!($this->pdo->exec($query))) {
+			$error = $this->pdo->errorInfo();
+			throw new Exception($error[2]);
+		}
+	}
+	
+	/**
 	 * Aktualizuje wiersz w bazie danych
 	 * @param library_main_table $model
 	 */
@@ -45,7 +57,7 @@ class library_main_mapper {
 			$query1 .= sprintf("`%s` = '%s', ", $key, $value);
 		}
 		$query = sprintf("UPDATE `%s` SET %s WHERE `%s`='%d' LIMIT 1", $model->get_name(), rtrim($query1, ', '), $model->get_id_name(), $model->get_id());
-		$this->pdo->exec($query);
+		$this->pdo_exec_or_error($query);
 	}
 	
 	/**
@@ -64,10 +76,7 @@ class library_main_mapper {
 			}
 		}
 		$query = sprintf("INSERT INTO `%s` (%s) VALUES (%s)", $model->get_name(), rtrim($query1, ', '), rtrim($query2, ', '));
-		if (!($this->pdo->exec($query))) {
-			$error = $this->pdo->errorInfo();
-			throw new Exception($error[2]);
-		}
+		$this->pdo_exec_or_error($query);
 		
 		return $this->pdo->lastInsertId();
 	}
@@ -78,7 +87,7 @@ class library_main_mapper {
 	 */
 	function delete(library_main_table $model) {
 		$query = sprintf("DELETE FROM `%s` WHERE `%s`='%d' LIMIT 1", $model->get_name(), $model->get_id_name(), $model->get_id());
-		$this->pdo->exec($query);
+		$this->pdo_exec_or_error($query);;
 	}
 	
 	/**
@@ -87,13 +96,13 @@ class library_main_mapper {
 	 * @param string $table
 	 * @param string $where
 	 * @throws Exception Gdy błąd bazy danych
-	 * @return array
+	 * @return array tablice z wynikami
 	 */
 	function fetchAllAssoc($select, $table, $where){
 		$query = sprintf("SELECT %s FROM `%s` WHERE %s", $select, $table, $where);
 		$result = $this->pdo->query($query);
 		if ($result == FALSE) {
-			$error_message = $self->pdo->errorInfo();
+			$error_message = $this->pdo->errorInfo();
 			throw new Exception($error_message[2]);
 		}
 		$wynik = $result->fetchAll(PDO::FETCH_ASSOC);

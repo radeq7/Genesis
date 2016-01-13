@@ -11,20 +11,25 @@ abstract class library_main_table {
 	 * Numer id w bazie danych
 	 * @var int
 	 */
-	protected $id = 0;
+	protected $db_id = 0;
 	/**
 	 * Nazwa domyślna kolumny 'id' w tabeli
 	 * @var string
 	 */
 	protected $id_name = 'id';
 	
-	/**
-	 * Deleguje pobranie wartości z tabeli bazy danych i zapisuje je do tablicy $dbValues
-	 * @param int $id nr id w tabeli bazy dancyh
-	 */
-	function load($id){
-		$this->id = $id;
-		$this->load_variable(library_main_objectWatcher::get_model($this));
+	function __construct($id=0){
+		$this->db_id = $id;
+	}
+	
+	static function load($id=0){
+		$object = new static($id);
+		if ($id) {
+			return library_main_objectWatcher::get_model($object);
+		}
+		else {
+			return $object;
+		}
 	}
 	
 	/**
@@ -68,7 +73,7 @@ abstract class library_main_table {
 	}
 	
 	function get_id(){
-		return $this->id;
+		return $this->db_id;
 	}
 	
 	/**
@@ -88,7 +93,9 @@ abstract class library_main_table {
 	 * Oznacza obiekt, jako do aktualizacji
 	 */
 	protected function markSave(){
-		if ($this->id)
+		if ($this->db_id)
 			library_main_objectWatcher::add_dirty($this);
+		else
+			library_main_objectWatcher::add_new($this);
 	}
 }

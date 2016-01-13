@@ -40,6 +40,10 @@ class library_main_view {
 		$this->views[] = $view;
 	}
 	
+	function clear_view(){
+		$this->views = array();
+	}
+	
 	function auto_render_view() {
 		if ($this->auto_render_switch) 
 			$this->render_view();
