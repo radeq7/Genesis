@@ -1,4 +1,5 @@
 <?php
+namespace Genesis\library\main;
 
 /**
  * Tworzy obiekt PDO
@@ -6,16 +7,16 @@
  * 
  * @package Genesis
  */
-class library_main_db {
+class db {
 	private static $instance;
 	
 	static public function getPdo() {
 		if (empty(self::$instance)) {
 			$adres = sprintf('mysql:host=%s;dbname=%s;charset=%s', 
-					library_main_appConfig::getConfig('db_host'), 
-					library_main_appConfig::getConfig('db_name'), 
-					library_main_appConfig::getConfig('db_charset'));
-			self::$instance = new PDO($adres, library_main_appConfig::getConfig('db_username'), library_main_appConfig::getConfig('db_pass'));
+					appConfig::getConfig('db_host'), 
+					appConfig::getConfig('db_name'), 
+					appConfig::getConfig('db_charset'));
+			self::$instance = new \PDO($adres, appConfig::getConfig('db_username'), appConfig::getConfig('db_pass'));
 		}
 		return self::$instance;
 	}

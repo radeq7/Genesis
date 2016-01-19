@@ -1,6 +1,6 @@
 <?php
 
-class ErrorController extends library_main_controller {
+class ErrorController extends \Genesis\library\main\controller {
 	
 	function indexAction() {
 	}

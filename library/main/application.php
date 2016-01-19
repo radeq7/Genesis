@@ -1,4 +1,5 @@
 <?php
+namespace Genesis\library\main;
 
 /**
  * Główny rdzeń aplikacji.
@@ -17,31 +18,28 @@ class application {
 	function init() {
 		session_start();
 		
-		//załadowanie autoloadera;
-		require_once BASE_PATH . 'library/main/autoloader.php';
-		
 		// wczytanie konfiguracji aplikacji
 		ini_set('display_errors', '1');
-		require_once BASE_PATH . 'library/config.php';
+		require_once BASE_PATH . '/library/config.php';
 		
 		// WYŚWIETLANIE BŁĘDÓW
-		$this->error_switch(library_main_appConfig::getConfig('error'));
+		$this->error_switch(appConfig::getConfig('error'));
 		
 		
 	}
 	
 	function run() {
 		
-		$request = new library_main_requestUrl();
+		$request = new requestUrl();
 		
 		// uruchomienie routera z przekazanym obiektem request
-		$router = new library_main_router();
+		$router = new router();
 		$router->run($request);
 	}
 	
 	static function end() {
 		// czynności końcowe aplikacji
-		library_main_objectWatcher::execute();
+		objectWatcher::execute();
 	}
 	
 	function error_switch($error) {

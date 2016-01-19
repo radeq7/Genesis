@@ -1,13 +1,17 @@
 <?php
+namespace Genesis;
 
-define("BASE_PATH", dirname(__FILE__) . '/');
-require_once 'library/main/application.php';
+// Zdefiniowanie ścieżki do całej aplikacji
+define("BASE_PATH", dirname(__FILE__));
+
+// Załadowanie autoloadera
+require_once BASE_PATH . '/library/main/autoloader.php';
 
 // uruchomienie aplikacji
 try {
-	$application = new application();
+	$application = new library\main\application();
 	$application->start();
 }
-catch (Exception $error) {
+catch (\Exception $error) {
 	echo $error->getMessage();
 }

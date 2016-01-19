@@ -1,6 +1,7 @@
 <?php
+namespace Genesis\library\main;
 
-class library_main_controller {
+class controller {
 	protected $parameters = array();
 	protected $view;
 	

@@ -1,11 +1,17 @@
 <?php
 
-function __autoload($classname) {
-	if ($cut_lenght = strrpos($classname, "\\"))
-		$cut_lenght++;
-	else 
-		$cut_lenght = 0;
-	$classname = substr($classname, $cut_lenght);
-	$path = BASE_PATH . str_replace('_', DIRECTORY_SEPARATOR, $classname) . '.php'; 
-	include_once $path;
-}
+spl_autoload_register(function ($class) {
+	if (substr($class, 0, 8) !== 'Genesis\\') {
+		return;
+	}
+	$class = substr($class, 8);
+
+	$path = BASE_PATH . '\\' . $class. '.php';
+	if (is_readable($path)) {
+		require_once $path;
+	}
+
+	
+});
+
+

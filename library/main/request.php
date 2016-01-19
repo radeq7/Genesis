@@ -1,11 +1,12 @@
 <?php
+namespace Genesis\library\main;
 
 /**
  * Pobiera i przechowuje informacje o żądaniu od użytkownika.
  * 
  * @package Genesis
  */
-class library_main_request {
+class request {
 	protected $default_controller_name;
 	protected $default_action_name;
 	protected $error_controller_name;
@@ -49,7 +50,7 @@ class library_main_request {
 	}
 	
 	function get_controller_path_by_name($controller_name) {
-		return BASE_PATH . 'controller/' . $controller_name . '.php';
+		return BASE_PATH . '/controller/' . $controller_name . '.php';
 	}
 	
 

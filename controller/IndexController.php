@@ -1,6 +1,6 @@
 <?php
 
-class IndexController extends library_main_controller {
+class IndexController extends \Genesis\library\main\controller {
 	
 	function indexAction() {
 	}

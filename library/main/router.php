@@ -1,4 +1,5 @@
 <?php
+namespace Genesis\library\main;
 
 /**
  * Sprawdza czy istnieje i uruchamia odpowiednią akcję kontrolera.
@@ -6,16 +7,16 @@
  * 
  * @package Genesis
  */
-class library_main_router {
+class router {
 	
 	function __construct() {
 	}
 	
-	function run(library_main_request $request) {
+	function run(request $request) {
 		$this->run_request($request);
 	}
 	
-	protected function run_request(library_main_request $request) {
+	protected function run_request(request $request) {
 
 		$controller_name = $this->get_controller_name($request);
 		
@@ -47,7 +48,7 @@ class library_main_router {
 	 * @throws \Exception
 	 * @return string nazwa istniejącego kontrolera
 	 */
-	protected function get_controller_name(library_main_request $request) { 
+	protected function get_controller_name(request $request) { 
 		
 		// sprawdź czy plik kontrolera istnieje
 		if (file_exists($request->get_controller_path_by_name($request->get_controller_name())))
@@ -62,7 +63,7 @@ class library_main_router {
 		return $controller_name;
 	}
 	
-	protected function get_action_name($controller_name, library_main_request $request) {
+	protected function get_action_name($controller_name, request $request) {
 
 		if (method_exists($controller_name, $request->get_action_name()))
 			$action_name = $request->get_action_name();
@@ -82,7 +83,7 @@ class library_main_router {
 	
 	protected function create_view($controller_name, $action_name) {
 		$view_name = substr($controller_name, 0, -10) . '/' . substr($action_name, 0, -6) . '.php';  
-		$view = new \library_main_view($view_name);
+		$view = new view($view_name);
 		return $view;
 	}
 	
@@ -90,7 +91,7 @@ class library_main_router {
 		require_once $controller_path; 		
 	}
 	
-	protected function run_controller(\library_main_controller $controller, $action_name) {
+	protected function run_controller(controller $controller, $action_name) {
 		$controller->init();
 		$controller->$action_name();
 		$controller->end();
@@ -98,7 +99,7 @@ class library_main_router {
 	
 	static function redirect($redirect, $type=NULL) {
 		if ($type == 'LOGIN') {
-			$redirect = library_main_appConfig::getConfig('login_site');
+			$redirect = appConfig::getConfig('login_site');
 		}
 		application::end();
 		header('Location: '.$redirect);

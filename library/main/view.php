@@ -1,6 +1,7 @@
 <?php
+namespace Genesis\library\main;
 
-class library_main_view {
+class view {
 	protected $title = '';
 	protected $subtitle = '';
 	protected $style = array('style.css');
@@ -13,7 +14,7 @@ class library_main_view {
 	
 	function __construct($view_name) {
 		$this->add_view($view_name);
-		$this->title = library_main_appConfig::getConfig('title');
+		$this->title = appConfig::getConfig('title');
 	}
 	
 	function title($title){
@@ -67,13 +68,13 @@ class library_main_view {
 	protected function render_layout() {
 		if (!$this->if_layout_render) {
 			$this->if_layout_render = true;
-			include BASE_PATH . 'view/' . $this->layout_name;
+			include BASE_PATH . '/view/' . $this->layout_name;
 		}
 	}
 	
 	function render_views() {
 		foreach ($this->views as $view) {
-			include BASE_PATH . 'view/' . $view;
+			include BASE_PATH . '/view/' . $view;
 		}
 	}
 	 

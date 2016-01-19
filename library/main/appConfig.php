@@ -1,11 +1,12 @@
 <?php
+namespace Genesis\library\main;
 
 /** 
  * Klasa przechowuje dane konfiguracyjne całej aplikacji.
  * Dane przechowywane są w tablicy w postaci par: klucz - wartość.
  * @package Genesis
  */
-class library_main_appConfig {
+class appConfig {
 
 	static private $param = array();
 

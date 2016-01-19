@@ -18,7 +18,7 @@ fclose($plik);
 $plik = fopen($kontroler_plik, 'w+');
 $string = "<?php
 
-class " . $controller . "Controller extends library_main_controller {
+class " . $controller . "Controller extends \Genesis\library\main\controller {
 
 	function init() {
 		

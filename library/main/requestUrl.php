@@ -1,15 +1,16 @@
 <?php
+namespace Genesis\library\main;
 
 /**
  * Pobiera żądanie od użytkownika poprzez adres url
  * 
  * @package Genesis
  */
-class library_main_requestUrl extends library_main_request {
+class requestUrl extends request {
 	
 	protected function parse() {
 		$url = parse_url($_SERVER['REQUEST_URI']);
-		$siteAdres = library_main_appConfig::getConfig('siteAdres');
+		$siteAdres = appConfig::getConfig('siteAdres');
 		
 		// read url and remove white signs
 		$path = trim($url['path'], '/');
@@ -21,7 +22,6 @@ class library_main_requestUrl extends library_main_request {
 		
 		// podzielenie url na odpowiednie części i przypisanie do tablicy
 		$tablica = explode('/', $path);
-
 		// odczyt tablicy
 		if ($tablica[0] != '') {
 			$this->controller_name = ucfirst($tablica[0]);

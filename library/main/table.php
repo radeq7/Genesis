@@ -1,6 +1,7 @@
 <?php
+namespace Genesis\library\main;
 
-abstract class library_main_table {
+abstract class table {
 	
 	/**
 	 * Nazwa tabeli w bazie danych
@@ -25,7 +26,7 @@ abstract class library_main_table {
 	static function load($id=0){
 		$object = new static($id);
 		if ($id) {
-			return library_main_objectWatcher::get_model($object);
+			return objectWatcher::get_model($object);
 		}
 		else {
 			return $object;
@@ -47,21 +48,21 @@ abstract class library_main_table {
 	 * Oznacza obiekt do utworzenie nowego wiersza w tabeli bazy danych
 	 */
 	function markCreate(){
-		library_main_objectWatcher::add_new($this);
+		objectWatcher::add_new($this);
 	}
 	
 	/**
 	 * Oznacza obiekt, aby nie został zaktualizowany w bazie danych
 	 */
 	function markClean(){
-		library_main_objectWatcher::clean($this);
+		objectWatcher::clean($this);
 	}
 	
 	/**
 	 * Oznacza obiekt, aby został usunięty z bazy danych
 	 */
 	function markDelete(){
-		library_main_objectWatcher::add_delete($this);
+		objectWatcher::add_delete($this);
 	}
 	
 	function get_name(){
@@ -94,8 +95,8 @@ abstract class library_main_table {
 	 */
 	protected function markSave(){
 		if ($this->db_id)
-			library_main_objectWatcher::add_dirty($this);
+			objectWatcher::add_dirty($this);
 		else
-			library_main_objectWatcher::add_new($this);
+			objectWatcher::add_new($this);
 	}
 }
