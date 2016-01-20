@@ -9,7 +9,7 @@
 	<meta name="author" content="Radosław Kłos"/>
 	<meta name="application_name" content="Genesis framework"/>
 	<link rel="shortcut icon" href="public/images/favicon.ico" />
-<!-- 	<base href="/"/> -->
+	<base href="<?php echo '/' . Genesis\library\main\appConfig::getConfig('siteAdres');?>"/>
 <?php foreach ($this->style as $style){?>
 	<link rel="stylesheet" type="text/css" href="public/css/<?php echo $style;?>"/>
 <?php } foreach ($this->script as $script) echo '\t<script src="public/scripts/' . $script . '"></script>' ;?>	

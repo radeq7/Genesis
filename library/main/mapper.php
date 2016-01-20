@@ -30,7 +30,7 @@ class mapper {
 		if ($result == false)
 			throw new \Exception(print_r($this->pdo->errorInfo()));
 		
-		if (!($wynik = $result->fetch(PDO::FETCH_ASSOC)))
+		if (!($wynik = $result->fetch(\PDO::FETCH_ASSOC)))
 			throw new \Exception(sprintf('Nie ma takiego rekordu (%s) w bazie danych!', $query));
 		
 		return $wynik;
@@ -106,7 +106,7 @@ class mapper {
 			$error_message = $this->pdo->errorInfo();
 			throw new \Exception($error_message[2]);
 		}
-		$wynik = $result->fetchAll(PDO::FETCH_ASSOC);
+		$wynik = $result->fetchAll(\PDO::FETCH_ASSOC);
 		return $wynik;
 	}
 }

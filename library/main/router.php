@@ -102,6 +102,7 @@ class router {
 			$redirect = appConfig::getConfig('login_site');
 		}
 		application::end();
+		//$redirect = appConfig::getConfig('siteAdres') . $redirect;
 		header('Location: '.$redirect);
 		exit();
 	}
