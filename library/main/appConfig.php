@@ -11,7 +11,9 @@ class appConfig {
 	static private $param = array();
 
 	static function getConfig($key) {
-		return self::$param[$key];
+		if (isset(self::$param[$key]))
+			return self::$param[$key];
+		throw new \Exception(sprintf('Klucz %s w appConfig nie istnieje!', $key));
 	}
 
 	static function setConfig($key, $value) {

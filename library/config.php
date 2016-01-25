@@ -1,21 +1,22 @@
 <?php
 namespace Genesis\library;
+use Genesis\library\main\appConfig;
 
 // adres strony
-main\appConfig::setConfig('siteAdres', 'my-site/Eclipse/GenesisFramework/');
+appConfig::setConfig('siteAdres', 'my-site/Eclipse/GenesisFramework/');
 
 // tytuł aplikacji
-main\appConfig::setConfig('title', 'Genesis Framework');
+appConfig::setConfig('title', 'Genesis Framework');
 
 // wyświetlanie błędów
-main\appConfig::setConfig('error', true);
+appConfig::setConfig('error', true);
 
 // dane do domyślnego połączenia z bazą dancyh
-main\appConfig::setConfig('db_host', 's8.masternet.pl');
-main\appConfig::setConfig('db_name', 'radeq');
-main\appConfig::setConfig('db_username', 'radeq');
-main\appConfig::setConfig('db_pass', 'LcLTzRFIbc31Xkiy4YvA');
-main\appConfig::setConfig('db_charset', 'utf8');
+appConfig::setConfig('db_host', 's8.masternet.pl');
+appConfig::setConfig('db_name', 'radeq');
+appConfig::setConfig('db_username', 'radeq');
+appConfig::setConfig('db_pass', 'LcLTzRFIbc31Xkiy4YvA');
+appConfig::setConfig('db_charset', 'utf8');
 
 // domyślna strona logowania
-main\appConfig::setConfig('login_site', '');
+appConfig::setConfig('login_site', '');
