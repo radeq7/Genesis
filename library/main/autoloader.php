@@ -5,8 +5,9 @@ spl_autoload_register(function ($class) {
 		return;
 	}
 	$class = substr($class, 8);
+	$class = str_replace('\\', DIRECTORY_SEPARATOR, $class);
 
-	$path = BASE_PATH . '\\' . $class. '.php';
+	$path = BASE_PATH . '/' . $class. '.php';
 	if (is_readable($path)) {
 		require_once $path;
 	}
