@@ -8,7 +8,6 @@ namespace Genesis\library\main;
  * @package Genesis
  */
 class application {
-	
 	function start() {
 		$this->init();
 		$this->run();
@@ -16,20 +15,17 @@ class application {
 	}
 	
 	function init() {
+		// uruchomienie sesji
 		session_start();
 		
 		// wczytanie konfiguracji aplikacji
-		ini_set('display_errors', '1');
 		require_once BASE_PATH . '/library/config.php';
 		
 		// WYŚWIETLANIE BŁĘDÓW
 		$this->error_switch(appConfig::getConfig('error'));
-		
-		
 	}
 	
 	function run() {
-		
 		$request = new requestUrl();
 		
 		// uruchomienie routera z przekazanym obiektem request
@@ -38,7 +34,6 @@ class application {
 	}
 	
 	static function end() {
-		// czynności końcowe aplikacji
 		objectWatcher::execute();
 	}
 	
