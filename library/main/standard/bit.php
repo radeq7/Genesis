@@ -12,7 +12,7 @@ class bit{
 	const BIT8 = 128;
 	private $int;
 	
-	function __contruct($int = 0){
+	function __construct($int = 0){
 		$this->int = $int;
 	}
 	
@@ -29,7 +29,8 @@ class bit{
 	}
 	
 	function getBit($nrBit){
-		return $this->int & $this->getBitValue($nrBit);
+		if ($this->int & $this->getBitValue($nrBit))
+			return TRUE;
 	}
 	
 	function removeBit($nrBit){
