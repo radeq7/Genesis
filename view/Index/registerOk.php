@@ -1,0 +1,1 @@
+Rejestracja użytkownika powiodła się!
