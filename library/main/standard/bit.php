@@ -1,4 +1,6 @@
 <?php
+namespace Genesis\library\main\standard;
+
 class bit{
 	const BIT1 = 1;
 	const BIT2 = 2;
