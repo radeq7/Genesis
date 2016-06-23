@@ -12,16 +12,20 @@ class user extends \Genesis\library\main\table{
 	protected $table_name = 'user';
 	protected $db_login = '';	// varchar255
 	protected $db_pass = '';	// char32
-	protected $db_isLogged = 0;	// tinyint
-	protected $db_loginTime = '';	// timestamp
+	protected $db_isLogged = 0;	// datetime
+	protected $db_loginTime = '';	// datetime
 	protected $db_loginToken = '';	// char32
-	protected $db_loginTimeExpired = '';	// timestamp
-	protected $db_loginWrong = 0;	// tinyint
+	protected $db_loginTimeExpired = '';	// datetime
 	protected $db_activateToken = '';	// char32
-	protected $db_banTime = '';	// timestamp
+	protected $db_banTime = '';	// datetime
 	protected $db_state = self::NOREGISTER;	//tinyint
-	protected $db_registerTime = '';	// timestamp
+	protected $db_registerTime = '';	// datetime
 	protected $db_privilage = 0;	// int unsigned
+	protected $db_changePassToken = '';	// char32
+	protected $db_changePassTime = '';	// datetime
+	protected $db_changeLogin = '';	// varchar255
+	protected $db_changeLoginTime = '';	// datetime
+	
 	
 	protected $validateUserStrategy;
 	protected $errorMessage = FALSE;
@@ -42,7 +46,7 @@ class user extends \Genesis\library\main\table{
 	}
 	function ban($minutesBan){
 		$this->db_state = self::BANNED;
-		// zapamiętaj datę wygaśnięcia bana
+		// zapamiętaj datę wygaśnięcia bana <----------------------------
 	}
 	function logout(){
 		$this->db_loginToken = '';
@@ -81,11 +85,30 @@ class user extends \Genesis\library\main\table{
 		$this->logout();
 		return FALSE;
 	}
-	function changePass($newPass){
-		$this->db_pass = $this->generateHashPass($pass);
+	/**
+	 * Zwraca token i ustawia login do zmiany i czas ważności zmiany, jeśli token się zgadza 
+	 */
+	function changeLogin($newLogin, $token){
+		if ($token == $this->generateChangeLoginToken() && $this->validateUserStrategy->checkLogin($newLogin)){
+			$this->db_changeLogin = $newLogin;
+			$this->db_changeLoginTime = $this->nowDate(); // dodaj 24h <----------------------------
+			$this->markSave();
+			return $this->generateChangeLoginActivateToken();
+		}
+		return FALSE;
 	}
-	function changeLogin($newLogin){
-		$this->db_login = $newLogin;
+	/**
+	 * Zmienia login, jeśli token i czas jego ważności się zgadza
+	 */
+	function changeLoginActivate($token){
+		if ($this->generateChangeLoginActivateToken() == $token && $this->db_changeLoginTime > $this->nowDate()){
+			$this->db_login = $this->db_changeLogin;
+			$this->db_changeLogin = '';
+			$this->db_changeLoginTime = '0000-00-00 00:00:00';
+			$this->markSave();
+			return TRUE;
+		}
+		return FALSE;
 	}
 	function setValidateUserStrategy(userValidate $strategy){
 		$this->validateUserStrategy = $strategy;
@@ -109,6 +132,33 @@ class user extends \Genesis\library\main\table{
 			return TRUE;
 		$bit = new \Genesis\library\main\standard\bit($this->db_privilage);
 		return $bit->getBit($privilage);
+	}
+	function remindPass(){
+		if ($this->db_state != self::ACTIVATE)
+			return FALSE;
+		$this->db_changePassToken = $this->generateActivateToken();
+		$this->db_changePassTime = $this->nowDate(); // dodaj 24 godziny <----------------------------
+		$this->markSave();
+		return TRUE;
+	}
+	function changePass($newPass, $token){
+		if ($this->db_changePassToken == $token && $this->db_changePassTime > $this->nowDate()){
+			$this->db_pass = $this->generateHashPass($newPass);
+			$this->db_changePassToken = '';
+			$this->db_changePassTime = '0000-00-00 00:00:00';
+			$this->markSave();
+			return TRUE;
+		}
+		return FALSE;
+	}
+	function generateActivateToken(){
+		return md5($this->nowDate() . appConfig::getConfig('salt'));
+	}
+	function generateChangeLoginToken(){
+		return md5($this->db_login . $this->db_id . appConfig::getConfig('salt'));
+	}
+	function generateChangeLoginActivateToken(){
+		return md5($this->db_changeLogin . $this->db_changeLoginTime . appConfig::getConfig('salt'));
 	}
 	protected function updateExpiredTime(){
 		$this->db_loginTimeExpired = $this->generateTimeExpired();
@@ -149,9 +199,9 @@ class user extends \Genesis\library\main\table{
 	protected function validateUser(){
 		if (!$this->validateUserStrategy->checkLogin($this->db_login))
 			return FALSE;
-			if (!$this->validateUserStrategy->checkPass($this->db_pass))
-				return FALSE;
-				return TRUE;
+		if (!$this->validateUserStrategy->checkPass($this->db_pass))
+			return FALSE;
+		return TRUE;
 	}
 	protected function generateTimeExpired(){
 		$date = new \DateTime();
@@ -164,9 +214,6 @@ class user extends \Genesis\library\main\table{
 	}
 	protected function generateLoginToken(){
 		return md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'] . appConfig::getConfig('salt'));
-	}
-	protected function generateActivateToken(){
-		return md5($this->nowDate() . appConfig::getConfig('salt'));
 	}
 	protected function nowDate(){
 		return date("Y-m-d H:i:s");

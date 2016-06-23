@@ -1,0 +1,1 @@
+Link do zmiany hasła został wysłany na podany adres!

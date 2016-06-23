@@ -6,7 +6,13 @@ class auth{
 	static $loginSite = '../index/secret';
 	static $registerOkSite = 'registerOk';
 	static $activateOkSite = 'activateOk';
+	static $remindOkSite = 'remindOk';
+	static $changePassOkSite = 'changePassOk';
+	static $changeLoginOk = 'changeLoginOk';
+	static $changeLoginSendSite = 'changeLoginSend';
 	static $activateMessage;
+	static $remindMessage;
+	static $changeLoginMessage;
 	
 	private function __construct(){}
 	
@@ -77,5 +83,51 @@ class auth{
 			return;
 		if ($user->activate($data['token']))
 			\Genesis\library\main\router::redirect(self::$activateOkSite);
+	}
+	
+	static function remind(){
+		if (!isset($_POST['login']))
+			return;
+		$user = userFactory::getUserByLogin($_POST['login']);
+		if (!$user)
+			return;
+		if ($user->remindPass()){
+			//$this->remindMessage->send();
+			\Genesis\library\main\router::redirect(self::$remindOkSite);
+		}
+	}
+	
+	static function changePass($data){
+		if (!isset($data['login']) || !isset($data['token']) || !isset($_POST['pass']) || !isset($_POST['pass2']))
+			return;
+		if ($_POST['pass'] != $_POST['pass2'])
+			return;
+		$user = userFactory::getUserByLogin($data['login']);
+		if (!$user)
+			return;
+		if ($user->changePass($_POST['pass'], $data['token']))
+			\Genesis\library\main\router::redirect(self::$changePassOkSite);
+	}
+	
+	static function changeLogin($data){
+		if (!isset($data['login']) || !isset($data['token']) || !isset($_POST['login']))
+			return;
+		$user = userFactory::getUserByLogin($data['login']);
+		if (!$user)
+			return;
+		if ($user->changeLogin($_POST['login'], $data['token'])){
+			//$this->changeLoginMessage->send();
+			\Genesis\library\main\router::redirect(self::$changeLoginSendSite);
+		}
+	}
+	
+	static function changeLoginCheck($data){
+		if (!isset($data['login']) || !isset($data['token']))
+			return;
+		$user = userFactory::getUserByLogin($data['login']);
+		if (!$user)
+			return;
+		if ($user->changeLoginActivate($data['token']))
+			\Genesis\library\main\router::redirect(self::$changeLoginOk);
 	}
 }
