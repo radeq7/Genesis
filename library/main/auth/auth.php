@@ -2,134 +2,196 @@
 namespace Genesis\library\main\auth;
 
 class auth{
-	protected $pdo;
-	protected $user;
-	protected $sessionLiveTime = 20;
+	static private $user = false;
+	static $loginSite = '../index/secret';
+	static $registerOkSite = 'registerOk';
+	static $activateOkSite = 'activateOk';
+	static $remindOkSite = 'remindOk';
+	static $changePassOkSite = 'changePassOk';
+	static $changeLoginOk = 'changeLoginOk';
+	static $changeLoginSendSite = 'changeLoginSend';
+	static $activateMessage;
+	static $remindMessage;
+	static $changeLoginMessage;
 	
-	protected $userDbTableName = 'user';
-	protected $idDbName = 'id';
-	protected $emailDbName = 'login';
-	protected $passDbName = 'pass';
+	private function __construct(){}
 	
-	protected $salt = '8h';
-	
-	function __construct($pdo, array $option = array()){
-		$this->pdo = $pdo;
-		if (isset($option['sessionLiveTime']))
-			$this->userDbTableName = $option['sessionLiveTime'];
-		if (isset($option['userDbTableName']))
-			$this->userDbTableName = $option['userDbTableName'];
-		if (isset($option['idDbName']))
-			$this->idDbName = $option['idDbName'];
-		if (isset($option['emailDbName']))
-			$this->emailDbName = $option['emailDbName'];
-		if (isset($option['passDbName']))
-			$this->passDbName = $option['passDbName'];
-		if (isset($option['salt']))
-			$this->salt = $option['salt'];
-		if (isset($_SESSION['auth_id']))
-			$this->user = user::load($_SESSION['auth_id']);
-	}
-	
-	/**
-	 * Zalogowuje usera
-	 */
-	function login($login, $pass){
-		$idUser = $this->getIdUser($login, $pass);
-		if ($idUser){
-			$this->user = user::load($idUser);
-			$this->user->login($this->generateToken(), $this->generateExpiredTime());
-			$_SESSION['auth_id'] = $idUser;
-			return TRUE;
-		}
-		$this->logout();
+	static function checkPrivilage($privilage = 0){
+		if (self::isLogged() && self::$user->update())
+			return self::$user->checkPrivilage($privilage);
 		return FALSE;
 	}
 	
-	/**
-	 * Wylogowuje usera
-	 */
-	function logout(){
-		if ($this->user){
-			$this->user->logout();
-			$this->user = FALSE;
-		}
-		unset ($_SESSION['auth_id']);
+	static function isLogged(){
+		if (!isset($_SESSION['userId']) || !$_SESSION['userId'])
+			return FALSE;
+		if (!self::$user)
+			self::$user = user::load($_SESSION['userId']);
+		if (!self::$user)
+			return FALSE;
 		return TRUE;
 	}
 	
-	/**
-	 * Sprawdza czy użytkownik jest zalogowany i posiada uprawnienia
-	 * Wartość 0 oznacza że nie potrzeba żadnych uprawnień, wystarczy zalogowany user
-	 * @return bool
-	 */
-	function checkPrivilage($privilage){
-		if ($this->user && $this->user->checkTokenAndTime($this->generateToken())){
-			$this->user->updateExpiredTime($this->generateExpiredTime());
-			if ($privilage == 0)
-				return TRUE;
-			return $this->user->checkPrivilage($privilage);
+	static function login($view){
+		if (!isset($_POST['login']) || !isset($_POST['pass']))
+			return;
+		$user = userFactory::getUserByLogin($_POST['login']);
+		if (!$user){
+			self::showError($view, user::ERROR_WRONG_LOGIN_OR_PASS);
+			return;
 		}
-		return FALSE;
-	}
-	
-	/**
-	 * Zwraca obiekt usera jeśli jest lub false
-	 */
-	function getUser(){
-		if ($this->user)
-			return $this->user;
-		return FALSE;
-	}
-	
-	/**
-	 * Zwraca id użytkownika jeśli zalogowany, lub false jeśli nie
-	 */
-	function getId(){
-		if ($this->user)
-			return $this->user->get_id();
-		return FALSE;
-	}
-	
-	/**
-	 * Generuje token
-	 */
-	protected function generateToken(){
-		return md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'] . $this->salt);
-	}
-	
-	/**
-	 * Generuje czas wygaśnięcia sesji
-	 */
-	protected function generateExpiredTime(){
-		$date = new \DateTime();
-		$timeChange = sprintf("PT%dM", $this->sessionLiveTime);
-		$date->add(new \DateInterval($timeChange));
-		return $date->format('Y-m-d H:i:s');
-	}
-	
-	/**
-	 * Hashuje i soli hasło
-	 */
-	protected function generateHash($pass){
-		return md5($pass . $this->salt);
-	}
-	
-	/**
-	 * Zwraca id użytkownika
-	 * Jeśli istnieje użytkonik o podanym loginie i haśle, zwraca jego id, jeśli nie zwraca false.
-	 */
-	protected function getIdUser($login, $pass){
-		$pass = $this->generateHash($pass);
-		$query = sprintf("SELECT %s FROM `%s` WHERE `%s`='%s' AND `%s`='%s'", $this->idDbName, $this->userDbTableName, $this->emailDbName, $login, $this->passDbName, $pass);
-		$result = $this->pdo->query($query);
-		if ($result == FALSE) {
-			$error_message = $this->pdo->errorInfo();
-			throw new \Exception($error_message[2]);
+		if ($user->login($_POST['pass'])){
+			$_SESSION['userId'] = $user->get_id();
+			self::$user = $user;
+			\Genesis\library\main\router::redirect(self::$loginSite);
 		}
-		$wynik = $result->fetchAll(\PDO::FETCH_ASSOC);
-		if (count($wynik))
-			return $wynik[0][$this->idDbName];
-		return false;	
+		else 
+			self::showError($view, user::ERROR_WRONG_LOGIN_OR_PASS);
+	}
+	
+	static function logout(){
+		if (self::isLogged())
+			self::$user->logout();
+		self::$user = false;
+		$_SESSION['userId'] = 0;
+	}
+	
+	static function getUser(){
+		if (self::isLogged())
+			return self::$user;
+		return FALSE;
+	}
+	
+	static function getIdUser(){
+		if (self::isLogged())
+			return self::$user->get_id();
+		return FALSE;
+	}
+	
+	static function register($view){
+		if (!isset($_POST['login']) || !isset($_POST['pass']))
+			return;
+		$user = new user();
+		$user->createUser($_POST['login'], $_POST['pass']);
+		if ($user->register()){
+			//$this->activateMessage->send();
+			\Genesis\library\main\router::redirect(self::$registerOkSite);
+		}
+		else 
+			self::showError($view, $user->getErrorMessage());
+	}
+	
+	static function showError($view, $errorNr){
+		switch($errorNr){
+			case user::ERROR:
+				$view->add_view_before('Index/Info/error.php');
+				break;
+			case user::ERROR_INCORRECT_LOGIN:
+				$view->add_view_before('Index/Info/incorrectLogin.php');
+				break;
+			case user::ERROR_INCORRECT_PASS:
+				$view->add_view_before('Index/Info/incorrectPass.php');
+				break;
+			case user::ERROR_LOGIN_EXIST:
+				$view->add_view_before('Index/Info/loginExist.php');
+				break;
+			case user::ERROR_LOGIN_NOT_EXIST:
+				$view->add_view_before('Index/Info/loginNotExist.php');
+				break;
+			case user::ERROR_WRONG_LOGIN_OR_PASS:
+				$view->add_view_before('Index/Info/wrongLoginOrPass.php');
+				break;
+			case user::ERROR_PASS_NOT_SAME:
+				$view->add_view_before('Index/Info/passNotSame.php');
+				break;
+			case user::ERROR_INCORRECT_TOKEN:
+				$view->add_view_before('Index/Info/incorrectToken.php');
+				break;
+			case user::ERROR_LINK_EXPIRED:
+				$view->add_view_before('Index/Info/linkExpired.php');
+				break;
+			case user::ERROR_USER_NOT_ACTIVE:
+				$view->add_view_before('Index/Info/userNotActive.php');
+				break;
+			default:
+		}
+	}
+	
+	static function activate($data){
+		if (!isset($data['login']) || !isset($data['token']))
+			return;
+		$user = userFactory::getUserByLogin($data['login']);
+		if (!$user)
+			return;
+		if ($user->activate($data['token']))
+			\Genesis\library\main\router::redirect(self::$activateOkSite);
+	}
+	
+	static function remind($view){
+		if (!isset($_POST['login']))
+			return;
+		$user = userFactory::getUserByLogin($_POST['login']);
+		if (!$user){
+			self::showError($view, user::ERROR_LOGIN_NOT_EXIST);
+			return;
+		}
+		if ($user->remindPass()){
+			//$this->remindMessage->send();
+			\Genesis\library\main\router::redirect(self::$remindOkSite);
+		}
+		else 
+			self::showError($view, $user->getErrorMessage());
+	}
+	
+	static function changePass($data, $view){
+		if (!isset($_POST['pass']) || !isset($_POST['pass2']))
+			return;
+		if (!isset($data['login']) || !isset($data['token'])){
+			self::showError($view, user::ERROR);
+			return;
+		}
+		if ($_POST['pass'] != $_POST['pass2']){
+			self::showError($view, user::ERROR_PASS_NOT_SAME);
+			return;
+		}
+		$user = userFactory::getUserByLogin($data['login']);
+		if (!$user){
+			self::showError($view, user::ERROR);
+			return;
+		}
+		if ($user->changePass($_POST['pass'], $data['token']))
+			\Genesis\library\main\router::redirect(self::$changePassOkSite);
+		else 
+			self::showError($view, $user->getErrorMessage());
+	}
+	
+	static function changeLogin($data, $view){
+		if (!isset($_POST['login']))
+			return;
+		if (!isset($data['login']) || !isset($data['token'])){
+			self::showError($view, user::ERROR);
+			return;
+		}
+		$user = userFactory::getUserByLogin($data['login']);
+		if (!$user){
+			self::showError($view, user::ERROR);
+			return;
+		}
+		if ($user->changeLogin($_POST['login'], $data['token'])){
+			//$this->changeLoginMessage->send();
+			\Genesis\library\main\router::redirect(self::$changeLoginSendSite);
+		}
+		else
+			self::showError($view, $user->getErrorMessage());
+	}
+	
+	static function changeLoginCheck($data){
+		if (!isset($data['login']) || !isset($data['token']))
+			return;
+		$user = userFactory::getUserByLogin($data['login']);
+		if (!$user)
+			return;
+		if ($user->changeLoginActivate($data['token']))
+			\Genesis\library\main\router::redirect(self::$changeLoginOk);
 	}
 }

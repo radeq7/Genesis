@@ -3,7 +3,7 @@ namespace Genesis\library;
 use Genesis\library\main\appConfig;
 
 // adres strony
-appConfig::setConfig('siteAdres', '');
+appConfig::setConfig('siteAdres', 'my-site/EclipseWorkspace/GenesisFramework/');
 
 // tytuł aplikacji
 appConfig::setConfig('title', 'Genesis Framework');
@@ -12,28 +12,23 @@ appConfig::setConfig('title', 'Genesis Framework');
 appConfig::setConfig('error', true);
 
 // dane do domyślnego połączenia z bazą dancyh
-appConfig::setConfig('db_host', '');
-appConfig::setConfig('db_name', '');
-appConfig::setConfig('db_username', '');
-appConfig::setConfig('db_pass', '');
+appConfig::setConfig('db_host', '23112.m.tld.pl');
+appConfig::setConfig('db_name', 'baza23112_system_genix3');
+appConfig::setConfig('db_username', 'admin23112_system_genix3');
+appConfig::setConfig('db_pass', '9Vtz5x!O0d');
 appConfig::setConfig('db_charset', 'utf8');
 
 // domyślna strona logowania
-appConfig::setConfig('login_site', 'test');
+appConfig::setConfig('login_site', 'index');
 
+// czas trwania zalogowania w minutach
+appConfig::setConfig('sessionLiveTime', 30);
 
-// konfiguracja modułu autoryzacji
-// -------------------------------------
-$option = array();
-appConfig::setConfig('auth', false);// włącza moduł autoryzacji
-//$option['sessionLiveTime'] = ''; 	// czas trwania zalogowania w minutach
-//$option['userDbTableName'] = ''; 	// nazwa tabeli danych usera
-//$option['idDbName'] = ''; 		// nazwa pola id w tabeli bd
-//$option['emailDbName'] = ''; 		// nazwa pola loginu w tabeli bd
-//$option['passDbName'] = ''; 		// nazwa pola hasła w tabeli bd
-//$option['salt'] = ''; 			// ciąg znaków do solenia hasła
-appConfig::setConfig('option_auth', $option);
-// -------------------------------------
+// Sól: dowolny ciąg znaków do szyfrowania haseł
+appConfig::setConfig('salt', 's8h');
+
+// Uprawnienia
+const ADMIN = 1;
 
 // Ustawienie strefy czasowej dla aplikacji
 date_default_timezone_set('Europe/Warsaw');

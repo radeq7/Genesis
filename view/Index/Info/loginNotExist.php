@@ -1,0 +1,1 @@
+<p style="color: red;">Podanego adresu email nie ma bazie danych!</p>
