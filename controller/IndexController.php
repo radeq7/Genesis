@@ -2,14 +2,25 @@
 use Genesis\library\main\auth\auth;
 class IndexController extends \Genesis\library\main\controller {
 	
+	function init(){	
+	}
+	
 	function indexAction() {
 	}
 	
+	function secretAction() {
+		$this->needPrivilage();
+	}
+	
+	// REJESTRACJA
+	
 	function registerAction() {
-		auth::register();
+		auth::register($this->view);
 	}
 	
 	function registerOkAction() {}
+	
+	// AKTYWACJA
 	
 	function activateAction() {
 		auth::activate($this->parameters);
@@ -17,28 +28,28 @@ class IndexController extends \Genesis\library\main\controller {
 	
 	function activateOkAction() {}
 	
+	// LOGOWANIE
+	
 	function loginAction(){
-		auth::login($this->parameters);
+		auth::login($this->view);
 	}
+	
+	// WYLOGOWANIE
 	
 	function logoutAction() {
 		auth::logout();
 	}
 	
-	function secretAction() {
-		$this->needPrivilage();
-	}
-	
 	// ZMIANA HASŁA
 	
 	function remindPassAction() {
-		auth::remind();
+		auth::remind($this->view);
 	}
 	
 	function remindOkAction(){}
 	
 	function changePassAction(){
-		auth::changePass($this->parameters);
+		auth::changePass($this->parameters, $this->view);
 	}
 	
 	function changePassOkAction(){}
@@ -46,7 +57,7 @@ class IndexController extends \Genesis\library\main\controller {
 	// ZMIANA LOGINU
 	
 	function changeLoginAction(){
-		auth::changeLogin($this->parameters);
+		auth::changeLogin($this->parameters, $this->view);
 	}
 	
 	function changeLoginSendAction(){}

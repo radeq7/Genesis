@@ -1,0 +1,1 @@
+<p style="color: red;">Podany adres email jest już w bazie, podaj inny!</p>

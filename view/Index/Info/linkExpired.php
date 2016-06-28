@@ -1,0 +1,1 @@
+<p style="color: red;">Link wygasł!</p>

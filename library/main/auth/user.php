@@ -8,6 +8,16 @@ class user extends \Genesis\library\main\table{
 	const ACTIVATE = 2;
 	const BANNED = 3;
 	const BANTIMEMINUTES = 30;
+	const ERROR = 1;
+	const ERROR_INCORRECT_LOGIN = 2;
+	const ERROR_INCORRECT_PASS = 3;
+	const ERROR_LOGIN_EXIST = 4;
+	const ERROR_INCORRECT_TOKEN = 5;
+	const ERROR_WRONG_LOGIN_OR_PASS = 6;
+	const ERROR_PASS_NOT_SAME = 7;
+	const ERROR_LOGIN_NOT_EXIST = 8;
+	const ERROR_LINK_EXPIRED = 9;
+	const ERROR_USER_NOT_ACTIVE = 10;
 	
 	protected $table_name = 'user';
 	protected $db_login = '';	// varchar255
@@ -25,7 +35,6 @@ class user extends \Genesis\library\main\table{
 	protected $db_changePassTime = '';	// datetime
 	protected $db_changeLogin = '';	// varchar255
 	protected $db_changeLoginTime = '';	// datetime
-	
 	
 	protected $validateUserStrategy;
 	protected $errorMessage = FALSE;
@@ -64,10 +73,11 @@ class user extends \Genesis\library\main\table{
 	function register(){
 		if ($this->db_state != self::NOREGISTER)
 			return FALSE;
-			if ($this->validateUser()){
-				$this->registerUser();
-				return TRUE;
-			}
+		if ($this->validateUser()){
+			$this->registerUser();
+			return TRUE;
+		}
+		return FALSE;
 	}
 	function activate($token){
 		if ($this->db_state != self::NOACTIVATE)
@@ -89,13 +99,18 @@ class user extends \Genesis\library\main\table{
 	 * Zwraca token i ustawia login do zmiany i czas ważności zmiany, jeśli token się zgadza 
 	 */
 	function changeLogin($newLogin, $token){
-		if ($token == $this->generateChangeLoginToken() && $this->validateUserStrategy->checkLogin($newLogin)){
-			$this->db_changeLogin = $newLogin;
-			$this->db_changeLoginTime = $this->nowDate(); // dodaj 24h <----------------------------
-			$this->markSave();
-			return $this->generateChangeLoginActivateToken();
+		if ($token != $this->generateChangeLoginToken()){
+			$this->errorMessage = self::ERROR_INCORRECT_TOKEN;
+			return FALSE;
 		}
-		return FALSE;
+		if (!$this->validateUserStrategy->checkLogin($newLogin)){
+			$this->errorMessage = self::ERROR_INCORRECT_LOGIN;
+			return FALSE;
+		}
+		$this->db_changeLogin = $newLogin;
+		$this->db_changeLoginTime = $this->nowDate(); // dodaj 24h <----------------------------
+		$this->markSave();
+		return $this->generateChangeLoginActivateToken();
 	}
 	/**
 	 * Zmienia login, jeśli token i czas jego ważności się zgadza
@@ -114,6 +129,7 @@ class user extends \Genesis\library\main\table{
 		$this->validateUserStrategy = $strategy;
 	}
 	function getErrorMessage(){
+		return $this->errorMessage;
 	}
 	function addPrivilage($privilage){
 		$bit = new \Genesis\library\main\standard\bit($this->db_privilage);
@@ -134,22 +150,29 @@ class user extends \Genesis\library\main\table{
 		return $bit->getBit($privilage);
 	}
 	function remindPass(){
-		if ($this->db_state != self::ACTIVATE)
+		if ($this->db_state != self::ACTIVATE){
+			$this->errorMessage = self::ERROR_USER_NOT_ACTIVE;
 			return FALSE;
+		}
 		$this->db_changePassToken = $this->generateActivateToken();
 		$this->db_changePassTime = $this->nowDate(); // dodaj 24 godziny <----------------------------
 		$this->markSave();
 		return TRUE;
 	}
 	function changePass($newPass, $token){
-		if ($this->db_changePassToken == $token && $this->db_changePassTime > $this->nowDate()){
-			$this->db_pass = $this->generateHashPass($newPass);
-			$this->db_changePassToken = '';
-			$this->db_changePassTime = '0000-00-00 00:00:00';
-			$this->markSave();
-			return TRUE;
+		if ($this->db_changePassToken == $token){
+			$this->errorMessage = self::ERROR_INCORRECT_TOKEN;
+			return FALSE;
 		}
-		return FALSE;
+		if ($this->db_changePassTime > $this->nowDate()){
+			$this->errorMessage = self::ERROR_LINK_EXPIRED;
+			return FALSE;
+		}
+		$this->db_pass = $this->generateHashPass($newPass);
+		$this->db_changePassToken = '';
+		$this->db_changePassTime = '0000-00-00 00:00:00';
+		$this->markSave();
+		return TRUE;
 	}
 	function generateActivateToken(){
 		return md5($this->nowDate() . appConfig::getConfig('salt'));
@@ -187,7 +210,7 @@ class user extends \Genesis\library\main\table{
 		$this->db_loginWrong++;
 		if ($this->db_loginWrong >= 5)
 			$this->ban(self::BANTIMEMINUTES);
-			$this->markSave();
+		$this->markSave();
 	}
 	protected function checkTokenAndTime($token){
 		if ($this->db_loginToken == $token && $this->db_loginTimeExpired > $this->nowDate()){
@@ -197,9 +220,23 @@ class user extends \Genesis\library\main\table{
 		return FALSE;
 	}
 	protected function validateUser(){
-		if (!$this->validateUserStrategy->checkLogin($this->db_login))
+		if (!$this->checkLoginExist($this->db_login)){
+			$this->errorMessage = self::ERROR_LOGIN_EXIST;
 			return FALSE;
-		if (!$this->validateUserStrategy->checkPass($this->db_pass))
+		}
+		if (!$this->validateUserStrategy->checkLogin($this->db_login)){
+			$this->errorMessage = self::ERROR_INCORRECT_LOGIN;
+			return FALSE;
+		}
+		if (!$this->validateUserStrategy->checkPass($this->db_pass)){
+			$this->errorMessage = self::ERROR_INCORRECT_PASS;
+			return FALSE;
+		}
+		return TRUE;
+	}
+	protected function checkLoginExist($login){
+		$user = userFactory::getUserByLogin($login);
+		if ($user)
 			return FALSE;
 		return TRUE;
 	}

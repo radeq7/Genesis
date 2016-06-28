@@ -1,0 +1,1 @@
+<p style="color: red;">Podane dane są nieprawidłowe!</p>
