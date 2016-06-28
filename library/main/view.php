@@ -41,6 +41,10 @@ class view {
 		$this->views[] = $view;
 	}
 	
+	function add_view_before($view) {
+		array_unshift($this->views, $view);
+	}
+	
 	function clear_view(){
 		$this->views = array();
 	}
