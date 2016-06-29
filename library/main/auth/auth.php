@@ -6,20 +6,18 @@ use Genesis\library\main\auth\email\remindPass;
 use Genesis\library\main\auth\email\changeLogin;
 class auth{
 	static private $user = false;
-	static $loginSite = '../index/secret';
-	static $activateSite = 'index/activate';
-	static $remindSite = 'index/remindPass';
-	static $changePassSite = 'index/changePass';
-	static $changeLoginSite = 'index/changeLogin';
-	static $changeLoginActivateSite = 'index/changeLoginCheck';
+	static $loginSite = '../auth/secret';
+	static $activateSite = 'auth/activate';
+	static $remindSite = 'auth/remindPass';
+	static $changePassSite = 'auth/changePass';
+	static $changeLoginSite = 'auth/changeLogin';
+	static $changeLoginActivateSite = 'auth/changeLoginCheck';
 	static $registerOkSite = 'registerOk';
 	static $activateOkSite = 'activateOk';
 	static $remindOkSite = 'remindOk';
 	static $changePassOkSite = 'changePassOk';
 	static $changeLoginOk = 'changeLoginOk';
 	static $changeLoginSendSite = 'changeLoginSend';
-	static $remindMessage;
-	static $changeLoginMessage;
 	
 	private function __construct(){}
 	
@@ -117,34 +115,34 @@ class auth{
 	static function showError($view, $errorNr){
 		switch($errorNr){
 			case user::ERROR:
-				$view->add_view_before('Index/Info/error.php');
+				$view->add_view_before('Auth/Info/error.php');
 				break;
 			case user::ERROR_INCORRECT_LOGIN:
-				$view->add_view_before('Index/Info/incorrectLogin.php');
+				$view->add_view_before('Auth/Info/incorrectLogin.php');
 				break;
 			case user::ERROR_INCORRECT_PASS:
-				$view->add_view_before('Index/Info/incorrectPass.php');
+				$view->add_view_before('Auth/Info/incorrectPass.php');
 				break;
 			case user::ERROR_LOGIN_EXIST:
-				$view->add_view_before('Index/Info/loginExist.php');
+				$view->add_view_before('Auth/Info/loginExist.php');
 				break;
 			case user::ERROR_LOGIN_NOT_EXIST:
-				$view->add_view_before('Index/Info/loginNotExist.php');
+				$view->add_view_before('Auth/Info/loginNotExist.php');
 				break;
 			case user::ERROR_WRONG_LOGIN_OR_PASS:
-				$view->add_view_before('Index/Info/wrongLoginOrPass.php');
+				$view->add_view_before('Auth/Info/wrongLoginOrPass.php');
 				break;
 			case user::ERROR_PASS_NOT_SAME:
-				$view->add_view_before('Index/Info/passNotSame.php');
+				$view->add_view_before('Auth/Info/passNotSame.php');
 				break;
 			case user::ERROR_INCORRECT_TOKEN:
-				$view->add_view_before('Index/Info/incorrectToken.php');
+				$view->add_view_before('Auth/Info/incorrectToken.php');
 				break;
 			case user::ERROR_LINK_EXPIRED:
-				$view->add_view_before('Index/Info/linkExpired.php');
+				$view->add_view_before('Auth/Info/linkExpired.php');
 				break;
 			case user::ERROR_USER_NOT_ACTIVE:
-				$view->add_view_before('Index/Info/userNotActive.php');
+				$view->add_view_before('Auth/Info/userNotActive.php');
 				break;
 			default:
 		}
