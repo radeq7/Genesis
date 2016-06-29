@@ -103,10 +103,15 @@ class user extends \Genesis\library\main\table{
 			$this->errorMessage = self::ERROR_INCORRECT_TOKEN;
 			return FALSE;
 		}
+		if (!$this->checkLoginExist($newLogin)){
+			$this->errorMessage = self::ERROR_LOGIN_EXIST;
+			return FALSE;
+		}
 		if (!$this->validateUserStrategy->checkLogin($newLogin)){
 			$this->errorMessage = self::ERROR_INCORRECT_LOGIN;
 			return FALSE;
 		}
+		
 		$this->db_changeLogin = $newLogin;
 		$this->db_changeLoginTime = $this->lateDate(); // dodaj 24h <----------------------------
 		$this->markSave();
