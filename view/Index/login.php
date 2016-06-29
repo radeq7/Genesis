@@ -1,3 +1,6 @@
+<?php
+use Genesis\library\main\auth\auth;
+?>
 Logowanie
 <form method="post">
 	<input type="text" value="" placeholder="Email" name="login" size="20" />
@@ -6,3 +9,4 @@ Logowanie
 	<br>
 	<input type="submit" value="Zaloguj" />
 </form>
+<a href="<?php echo auth::generateRemindLink()?>">Nie pamiętam hasła</a>

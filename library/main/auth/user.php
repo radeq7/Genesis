@@ -108,7 +108,7 @@ class user extends \Genesis\library\main\table{
 			return FALSE;
 		}
 		$this->db_changeLogin = $newLogin;
-		$this->db_changeLoginTime = $this->nowDate(); // dodaj 24h <----------------------------
+		$this->db_changeLoginTime = $this->lateDate(); // dodaj 24h <----------------------------
 		$this->markSave();
 		return $this->generateChangeLoginActivateToken();
 	}
@@ -116,14 +116,20 @@ class user extends \Genesis\library\main\table{
 	 * Zmienia login, jeśli token i czas jego ważności się zgadza
 	 */
 	function changeLoginActivate($token){
-		if ($this->generateChangeLoginActivateToken() == $token && $this->db_changeLoginTime > $this->nowDate()){
-			$this->db_login = $this->db_changeLogin;
-			$this->db_changeLogin = '';
-			$this->db_changeLoginTime = '0000-00-00 00:00:00';
-			$this->markSave();
-			return TRUE;
+		if ($this->generateChangeLoginActivateToken() != $token){
+			$this->errorMessage = self::ERROR_INCORRECT_TOKEN;
+			return FALSE;
 		}
-		return FALSE;
+		if ($this->db_changeLoginTime < $this->nowDate()){
+			$this->errorMessage = self::ERROR_LINK_EXPIRED;
+			return FALSE;
+		}
+		$this->db_login = $this->db_changeLogin;
+		$this->db_changeLogin = '';
+		$this->db_changeLoginTime = '0000-00-00 00:00:00';
+		$this->markSave();
+		return TRUE;
+		
 	}
 	function setValidateUserStrategy(userValidate $strategy){
 		$this->validateUserStrategy = $strategy;
@@ -160,12 +166,16 @@ class user extends \Genesis\library\main\table{
 		return TRUE;
 	}
 	function changePass($newPass, $token){
-		if ($this->db_changePassToken == $token){
+		if ($this->db_changePassToken != $token){
 			$this->errorMessage = self::ERROR_INCORRECT_TOKEN;
 			return FALSE;
 		}
-		if ($this->db_changePassTime > $this->nowDate()){
+		if ($this->db_changePassTime < $this->nowDate()){
 			$this->errorMessage = self::ERROR_LINK_EXPIRED;
+			return FALSE;
+		}
+		if (!$this->validateUserStrategy->checkPass($newPass)){
+			$this->errorMessage = self::ERROR_INCORRECT_PASS;
 			return FALSE;
 		}
 		$this->db_pass = $this->generateHashPass($newPass);
@@ -185,6 +195,15 @@ class user extends \Genesis\library\main\table{
 	}
 	function getEmail(){
 		return $this->db_login;
+	}
+	function getNewEmail(){
+		return $this->db_changeLogin;
+	}
+	function getActivateToken(){
+		return $this->db_activateToken;
+	}
+	function getChangePassToken(){
+		return $this->db_changePassToken;
 	}
 	protected function updateExpiredTime(){
 		$this->db_loginTimeExpired = $this->generateTimeExpired();
@@ -257,5 +276,8 @@ class user extends \Genesis\library\main\table{
 	}
 	protected function nowDate(){
 		return date("Y-m-d H:i:s");
+	}
+	protected function lateDate(){
+		return '2099-01-01 12:00:00';
 	}
 }

@@ -63,7 +63,7 @@ class IndexController extends \Genesis\library\main\controller {
 	function changeLoginSendAction(){}
 	
 	function changeLoginCheckAction(){
-		auth::changeLoginCheck($this->parameters);
+		auth::changeLoginCheck($this->parameters, $this->view);
 	}
 	
 	function changeLoginOkAction(){}
