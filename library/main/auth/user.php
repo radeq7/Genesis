@@ -183,6 +183,9 @@ class user extends \Genesis\library\main\table{
 	function generateChangeLoginActivateToken(){
 		return md5($this->db_changeLogin . $this->db_changeLoginTime . appConfig::getConfig('salt'));
 	}
+	function getEmail(){
+		return $this->db_login;
+	}
 	protected function updateExpiredTime(){
 		$this->db_loginTimeExpired = $this->generateTimeExpired();
 		$this->markSave();

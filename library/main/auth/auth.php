@@ -1,6 +1,7 @@
 <?php
 namespace Genesis\library\main\auth;
 
+use Genesis\library\main\auth\email\activateUser;
 class auth{
 	static private $user = false;
 	static $loginSite = '../index/secret';
@@ -10,7 +11,6 @@ class auth{
 	static $changePassOkSite = 'changePassOk';
 	static $changeLoginOk = 'changeLoginOk';
 	static $changeLoginSendSite = 'changeLoginSend';
-	static $activateMessage;
 	static $remindMessage;
 	static $changeLoginMessage;
 	
@@ -74,7 +74,8 @@ class auth{
 		$user = new user();
 		$user->createUser($_POST['login'], $_POST['pass']);
 		if ($user->register()){
-			//$this->activateMessage->send();
+			$activateMessage = new activateUser($user->getEmail(), 'link');
+			$activateMessage->send();
 			\Genesis\library\main\router::redirect(self::$registerOkSite);
 		}
 		else 

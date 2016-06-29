@@ -8,6 +8,9 @@ appConfig::setConfig('siteAdres', 'my-site/EclipseWorkspace/GenesisFramework/');
 // tytuł aplikacji
 appConfig::setConfig('title', 'Genesis Framework');
 
+// adres email strony
+appConfig::setConfig('email', 'email@genesisframework.pl');
+
 // wyświetlanie błędów
 appConfig::setConfig('error', true);
 
