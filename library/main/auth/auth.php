@@ -2,8 +2,6 @@
 namespace Genesis\library\main\auth;
 
 use Genesis\library\main\auth\email\activateUser;
-use Genesis\library\main\auth\email\remindPass;
-use Genesis\library\main\auth\email\changeLogin;
 class auth{
 	protected $userFactory;
 	protected $user = false;
@@ -221,5 +219,11 @@ class auth{
 			return FALSE;
 		}
 		return $user;
+	}
+	
+	function getRouter(){
+		$application = \Genesis\library\main\application::getInstance();
+		return $application->getResource('router');
+	
 	}
 }
