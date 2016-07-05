@@ -35,6 +35,21 @@ class auth{
 			return FALSE;
 		return TRUE;
 	}
+	function login($view){
+		if (!isset($_POST['login']) || !isset($_POST['pass']))
+			return;
+	
+			if (!$user = $this->loadUser($_POST['login'], user::ERROR_WRONG_LOGIN_OR_PASS, $view))
+				return;
+	
+				if ($user->login($_POST['pass'])){
+					$_SESSION['userId'] = $user->get_id();
+					$this->user = $user;
+					$this->getRouter()->redirect($this->loginSite);
+				}
+				else
+					$this->showError($view, user::ERROR_WRONG_LOGIN_OR_PASS);
+	}
 	function logout(){
 		if ($this->isLogged())
 			$this->user->logout();
@@ -71,21 +86,7 @@ class auth{
 		$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->changePassSite, $user->getEmail(), $user->getChangePassToken());
 		return $link;
 	}
-	function login($view){
-		if (!isset($_POST['login']) || !isset($_POST['pass']))
-			return;
-		
-		if (!$user = $this->loadUser($_POST['login'], user::ERROR_WRONG_LOGIN_OR_PASS, $view))
-			return;
-		
-		if ($user->login($_POST['pass'])){
-			$_SESSION['userId'] = $user->get_id();
-			$this->user = $user;
-			\Genesis\library\main\router::redirect($this->loginSite);
-		}
-		else
-			$this->showError($view, user::ERROR_WRONG_LOGIN_OR_PASS);
-	}	
+	
 	function register($view){
 		if (!isset($_POST['login']) || !isset($_POST['pass']))
 			return;
@@ -94,7 +95,7 @@ class auth{
 			if ($user->register()){
 				$activateMessage = new activateUser($user->getEmail(), $this->generateActivateLink($user));
 				$activateMessage->send();
-				\Genesis\library\main\router::redirect($this->registerOkSite);
+				$this->getRouter()->redirect($this->registerOkSite);
 			}
 			else
 				$this->showError($view, $user->getErrorMessage());
@@ -107,7 +108,7 @@ class auth{
 			return;
 		
 		if ($user->activate($data['token']))
-			\Genesis\library\main\router::redirect($this->activateOkSite);
+			$this->getRouter()->redirect($this->activateOkSite);
 	}	
 	function remind($view){
 		if (!isset($_POST['login']))
@@ -119,7 +120,7 @@ class auth{
 		if ($user->remindPass()){
 			$remindMessage = new remindPass($user->getEmail(), $this->generateChangePassLink($user));
 			$remindMessage->send();
-			\Genesis\library\main\router::redirect($this->remindOkSite);
+			$this->getRouter()->redirect($this->remindOkSite);
 		}
 		else 
 			$this->showError($view, $user->getErrorMessage());
@@ -140,7 +141,7 @@ class auth{
 			return;
 		
 		if ($user->changePass($_POST['pass'], $data['token']))
-			\Genesis\library\main\router::redirect($this->changePassOkSite);
+			$this->getRouter()->redirect($this->changePassOkSite);
 		else 
 			$this->showError($view, $user->getErrorMessage());
 	}	
@@ -158,7 +159,7 @@ class auth{
 		if ($user->changeLogin($_POST['login'], $data['token'])){
 			$changeLoginMessage = new changeLogin($user->getNewEmail(), $this->generateChangeLoginActivateLink($user));
 			$changeLoginMessage->send();
-			\Genesis\library\main\router::redirect($this->changeLoginSendSite);
+			$this->getRouter()->redirect($this->changeLoginSendSite);
 		}
 		else
 			$this->showError($view, $user->getErrorMessage());
@@ -173,7 +174,7 @@ class auth{
 			return;
 		
 		if ($user->changeLoginActivate($data['token']))
-			\Genesis\library\main\router::redirect($this->changeLoginOk);
+			$this->getRouter()->redirect($this->changeLoginOk);
 		else 
 			$this->showError($view, $user->getErrorMessage());
 	}

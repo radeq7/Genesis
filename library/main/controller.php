@@ -1,12 +1,14 @@
 <?php
 namespace Genesis\library\main;
-use Genesis\library\main\auth\auth;
 
 class controller {
+	protected $appResource = array();
 	protected $parameters = array();
 	protected $view;
 	
 	function __construct(array $parameters, view $view) {
+		$aplication = application::getInstance();
+		$this->appResource = $aplication->getResource();
 		$this->parameters = $parameters;
 		$this->view = $view;
 	}
@@ -19,14 +21,14 @@ class controller {
 	}
 
 	function needPrivilage($privilage = 0){
-		if ($this->auth->checkPrivilage($privilage))
+		$auth = $this->appResource->getResource('auth');
+		$router = $this->appResource->getResource('router');
+		
+		if ($auth->checkPrivilage($privilage))
 			return TRUE;
-		router::redirect('', 'LOGIN');
+		$router->redirect('', 'LOGIN');
+		echo 'NIEZALOGOWANY';
 		return FALSE;
 	}
 	
 }
-
-// widok musi posiadać w sobie auth
-// kontroler musi posiadać skonfigurowany obiekt auth
-// w obiekcie auth trzba wpiąć obiekty wiadomości email
