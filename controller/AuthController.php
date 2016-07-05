@@ -15,7 +15,7 @@ class AuthController extends \Genesis\library\main\controller {
 	// REJESTRACJA
 	
 	function registerAction() {
-		auth::register($this->view);
+		$this->auth->register($this->view);
 	}
 	
 	function registerOkAction() {}
@@ -23,7 +23,7 @@ class AuthController extends \Genesis\library\main\controller {
 	// AKTYWACJA
 	
 	function activateAction() {
-		auth::activate($this->parameters);
+		$this->auth->activate($this->parameters, $this->view);
 	}
 	
 	function activateOkAction() {}
@@ -31,25 +31,25 @@ class AuthController extends \Genesis\library\main\controller {
 	// LOGOWANIE
 	
 	function loginAction(){
-		auth::login($this->view);
+		$this->auth->login($this->view);
 	}
 	
 	// WYLOGOWANIE
 	
 	function logoutAction() {
-		auth::logout();
+		$this->auth->logout();
 	}
 	
 	// ZMIANA HASŁA
 	
 	function remindPassAction() {
-		auth::remind($this->view);
+		$this->auth->remind($this->view);
 	}
 	
 	function remindOkAction(){}
 	
 	function changePassAction(){
-		auth::changePass($this->parameters, $this->view);
+		$this->auth->changePass($this->parameters, $this->view);
 	}
 	
 	function changePassOkAction(){}
@@ -57,13 +57,13 @@ class AuthController extends \Genesis\library\main\controller {
 	// ZMIANA LOGINU
 	
 	function changeLoginAction(){
-		auth::changeLogin($this->parameters, $this->view);
+		$this->auth->changeLogin($this->parameters, $this->view);
 	}
 	
 	function changeLoginSendAction(){}
 	
 	function changeLoginCheckAction(){
-		auth::changeLoginCheck($this->parameters, $this->view);
+		$this->auth->changeLoginCheck($this->parameters, $this->view);
 	}
 	
 	function changeLoginOkAction(){}

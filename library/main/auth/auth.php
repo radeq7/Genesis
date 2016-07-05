@@ -5,114 +5,181 @@ use Genesis\library\main\auth\email\activateUser;
 use Genesis\library\main\auth\email\remindPass;
 use Genesis\library\main\auth\email\changeLogin;
 class auth{
-	static private $user = false;
-	static $loginSite = '../auth/secret';
-	static $activateSite = 'auth/activate';
-	static $remindSite = 'auth/remindPass';
-	static $changePassSite = 'auth/changePass';
-	static $changeLoginSite = 'auth/changeLogin';
-	static $changeLoginActivateSite = 'auth/changeLoginCheck';
-	static $registerOkSite = 'registerOk';
-	static $activateOkSite = 'activateOk';
-	static $remindOkSite = 'remindOk';
-	static $changePassOkSite = 'changePassOk';
-	static $changeLoginOk = 'changeLoginOk';
-	static $changeLoginSendSite = 'changeLoginSend';
+	protected $userFactory;
+	protected $user = false;
+	protected $loginSite = '../auth/secret';
+	protected $activateSite = 'auth/activate';
+	protected $remindSite = 'auth/remindPass';
+	protected $changePassSite = 'auth/changePass';
+	protected $changeLoginSite = 'auth/changeLogin';
+	protected $changeLoginActivateSite = 'auth/changeLoginCheck';
+	protected $registerOkSite = 'registerOk';
+	protected $activateOkSite = 'activateOk';
+	protected $remindOkSite = 'remindOk';
+	protected $changePassOkSite = 'changePassOk';
+	protected $changeLoginOk = 'changeLoginOk';
+	protected $changeLoginSendSite = 'changeLoginSend';
 	
-	private function __construct(){}
-	
-	static function checkPrivilage($privilage = 0){
-		if (self::isLogged() && self::$user->update())
-			return self::$user->checkPrivilage($privilage);
+	function __construct(){
+		$this->userFactory = new userFactory();
+	}
+	function checkPrivilage($privilage = 0){
+		if ($this->isLogged() && $this->user->update())
+			return $this->user->checkPrivilage($privilage);
 		return FALSE;
 	}
-	
-	static function isLogged(){
+	function isLogged(){
 		if (!isset($_SESSION['userId']) || !$_SESSION['userId'])
 			return FALSE;
-		if (!self::$user)
-			self::$user = user::load($_SESSION['userId']);
-		if (!self::$user)
+		if (!$this->user)
+			$this->user = $this->userFactory->getUserById($_SESSION['userId']);
+		if (!$this->user)
 			return FALSE;
 		return TRUE;
 	}
-	
-	static function login($view){
+	function logout(){
+		if ($this->isLogged())
+			$this->user->logout();
+		$this->user = false;
+		$_SESSION['userId'] = 0;
+	}	
+	function getUser(){
+		if ($this->isLogged())
+			return $this->user;
+		return FALSE;
+	}	
+	function getIdUser(){
+		if ($this->isLogged())
+			return $this->user->get_id();
+		return FALSE;
+	}	
+	function generateActivateLink($user){
+		$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->activateSite, $user->getEmail(), $user->getActivateToken());
+		return $link;
+	}	
+	function generateRemindLink(){
+		return $this->remindSite;
+	}	
+	function generateChangeLoginLink(){
+		$user = $this->getUser();
+		$link = sprintf('%s?login=%s&token=%s', $this->changeLoginSite, $user->getEmail(), $user->generateChangeLoginToken());
+		return $link;
+	}	
+	function generateChangeLoginActivateLink($user){
+		$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->changeLoginActivateSite, $user->getEmail(), $user->generateChangeLoginActivateToken());
+		return $link;
+	}
+	function generateChangePassLink($user){
+		$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->changePassSite, $user->getEmail(), $user->getChangePassToken());
+		return $link;
+	}
+	function login($view){
 		if (!isset($_POST['login']) || !isset($_POST['pass']))
 			return;
-		$user = userFactory::getUserByLogin($_POST['login']);
-		if (!$user){
-			self::showError($view, user::ERROR_WRONG_LOGIN_OR_PASS);
+		
+		if (!$user = $this->loadUser($_POST['login'], user::ERROR_WRONG_LOGIN_OR_PASS, $view))
 			return;
-		}
+		
 		if ($user->login($_POST['pass'])){
 			$_SESSION['userId'] = $user->get_id();
-			self::$user = $user;
-			\Genesis\library\main\router::redirect(self::$loginSite);
+			$this->user = $user;
+			\Genesis\library\main\router::redirect($this->loginSite);
 		}
-		else 
-			self::showError($view, user::ERROR_WRONG_LOGIN_OR_PASS);
-	}
-	
-	static function logout(){
-		if (self::isLogged())
-			self::$user->logout();
-		self::$user = false;
-		$_SESSION['userId'] = 0;
-	}
-	
-	static function getUser(){
-		if (self::isLogged())
-			return self::$user;
-		return FALSE;
-	}
-	
-	static function getIdUser(){
-		if (self::isLogged())
-			return self::$user->get_id();
-		return FALSE;
-	}
-	
-	static function register($view){
+		else
+			$this->showError($view, user::ERROR_WRONG_LOGIN_OR_PASS);
+	}	
+	function register($view){
 		if (!isset($_POST['login']) || !isset($_POST['pass']))
 			return;
-		$user = new user();
-		$user->createUser($_POST['login'], $_POST['pass']);
-		if ($user->register()){
-			$activateMessage = new activateUser($user->getEmail(), self::generateActivateLink($user));
-			$activateMessage->send();
-			\Genesis\library\main\router::redirect(self::$registerOkSite);
+			$user = $this->userFactory->getNewUser();
+			$user->createUser($_POST['login'], $_POST['pass']);
+			if ($user->register()){
+				$activateMessage = new activateUser($user->getEmail(), $this->generateActivateLink($user));
+				$activateMessage->send();
+				\Genesis\library\main\router::redirect($this->registerOkSite);
+			}
+			else
+				$this->showError($view, $user->getErrorMessage());
+	}	
+	function activate($data, $view){
+		if (!isset($data['login']) || !isset($data['token']))
+			return;
+		
+		if (!$user = $this->loadUser($data['login'], user::ERROR_INCORRECT_LOGIN, $view))
+			return;
+		
+		if ($user->activate($data['token']))
+			\Genesis\library\main\router::redirect($this->activateOkSite);
+	}	
+	function remind($view){
+		if (!isset($_POST['login']))
+			return;
+		
+		if (!$user = $this->loadUser($_POST['login'], user::ERROR_LOGIN_NOT_EXIST, $view))
+			return;
+		
+		if ($user->remindPass()){
+			$remindMessage = new remindPass($user->getEmail(), $this->generateChangePassLink($user));
+			$remindMessage->send();
+			\Genesis\library\main\router::redirect($this->remindOkSite);
 		}
 		else 
-			self::showError($view, $user->getErrorMessage());
+			$this->showError($view, $user->getErrorMessage());
+	}	
+	function changePass($data, $view){
+		if (!isset($_POST['pass']) || !isset($_POST['pass2']))
+			return;
+		if (!isset($data['login']) || !isset($data['token'])){
+			$this->showError($view, user::ERROR);
+			return;
+		}
+		if ($_POST['pass'] != $_POST['pass2']){
+			$this->showError($view, user::ERROR_PASS_NOT_SAME);
+			return;
+		}
+		
+		if (!$user = $this->loadUser($data['login'], user::ERROR, $view))
+			return;
+		
+		if ($user->changePass($_POST['pass'], $data['token']))
+			\Genesis\library\main\router::redirect($this->changePassOkSite);
+		else 
+			$this->showError($view, $user->getErrorMessage());
+	}	
+	function changeLogin($data, $view){
+		if (!isset($_POST['login']))
+			return;
+		if (!isset($data['login']) || !isset($data['token'])){
+			$this->showError($view, user::ERROR);
+			return;
+		}
+		
+		if (!$user = $this->loadUser($data['login'], user::ERROR, $view))
+			return;
+		
+		if ($user->changeLogin($_POST['login'], $data['token'])){
+			$changeLoginMessage = new changeLogin($user->getNewEmail(), $this->generateChangeLoginActivateLink($user));
+			$changeLoginMessage->send();
+			\Genesis\library\main\router::redirect($this->changeLoginSendSite);
+		}
+		else
+			$this->showError($view, $user->getErrorMessage());
+	}	
+	function changeLoginCheck($data, $view){
+		if (!isset($data['login']) || !isset($data['token'])){
+			$this->showError($view, user::ERROR);
+			return;
+		}
+		
+		if (!$user = $this->loadUser($data['login'], user::ERROR, $view))
+			return;
+		
+		if ($user->changeLoginActivate($data['token']))
+			\Genesis\library\main\router::redirect($this->changeLoginOk);
+		else 
+			$this->showError($view, $user->getErrorMessage());
 	}
-	
-	static function generateActivateLink($user){
-		$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], self::$activateSite, $user->getEmail(), $user->getActivateToken());
-		return $link;
-	}
-	
-	static function generateRemindLink(){
-		return self::$remindSite;
-	}
-	
-	static function generateChangeLoginLink(){
-		$user = auth::getUser();
-		$link = sprintf('%s?login=%s&token=%s', self::$changeLoginSite, $user->getEmail(), $user->generateChangeLoginToken());
-		return $link;
-	}
-	
-	static function generateChangeLoginActivateLink($user){
-		$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], self::$changeLoginActivateSite, $user->getEmail(), $user->generateChangeLoginActivateToken());
-		return $link;
-	}
-	
-	static function generateChangePassLink($user){
-		$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], self::$changePassSite, $user->getEmail(), $user->getChangePassToken());
-		return $link;
-	}
-	
-	static function showError($view, $errorNr){
+	protected function showError($view, $errorNr){
 		switch($errorNr){
 			case user::ERROR:
 				$view->add_view_before('Auth/Info/error.php');
@@ -147,90 +214,12 @@ class auth{
 			default:
 		}
 	}
-	
-	static function activate($data){
-		if (!isset($data['login']) || !isset($data['token']))
-			return;
-		$user = userFactory::getUserByLogin($data['login']);
-		if (!$user)
-			return;
-		if ($user->activate($data['token']))
-			\Genesis\library\main\router::redirect(self::$activateOkSite);
-	}
-	
-	static function remind($view){
-		if (!isset($_POST['login']))
-			return;
-		$user = userFactory::getUserByLogin($_POST['login']);
+	protected function loadUser($login, $error, $view){
+		$user = $this->userFactory->getUserByLogin($login);
 		if (!$user){
-			self::showError($view, user::ERROR_LOGIN_NOT_EXIST);
-			return;
+			$this->showError($view, $error);
+			return FALSE;
 		}
-		if ($user->remindPass()){
-			$remindMessage = new remindPass($user->getEmail(), self::generateChangePassLink($user));
-			$remindMessage->send();
-			\Genesis\library\main\router::redirect(self::$remindOkSite);
-		}
-		else 
-			self::showError($view, $user->getErrorMessage());
-	}
-	
-	static function changePass($data, $view){
-		if (!isset($_POST['pass']) || !isset($_POST['pass2']))
-			return;
-		if (!isset($data['login']) || !isset($data['token'])){
-			self::showError($view, user::ERROR);
-			return;
-		}
-		if ($_POST['pass'] != $_POST['pass2']){
-			self::showError($view, user::ERROR_PASS_NOT_SAME);
-			return;
-		}
-		$user = userFactory::getUserByLogin($data['login']);
-		if (!$user){
-			self::showError($view, user::ERROR);
-			return;
-		}
-		if ($user->changePass($_POST['pass'], $data['token']))
-			\Genesis\library\main\router::redirect(self::$changePassOkSite);
-		else 
-			self::showError($view, $user->getErrorMessage());
-	}
-	
-	static function changeLogin($data, $view){
-		if (!isset($_POST['login']))
-			return;
-		if (!isset($data['login']) || !isset($data['token'])){
-			self::showError($view, user::ERROR);
-			return;
-		}
-		$user = userFactory::getUserByLogin($data['login']);
-		if (!$user){
-			self::showError($view, user::ERROR);
-			return;
-		}
-		if ($user->changeLogin($_POST['login'], $data['token'])){
-			$changeLoginMessage = new changeLogin($user->getNewEmail(), self::generateChangeLoginActivateLink($user));
-			$changeLoginMessage->send();
-			\Genesis\library\main\router::redirect(self::$changeLoginSendSite);
-		}
-		else
-			self::showError($view, $user->getErrorMessage());
-	}
-	
-	static function changeLoginCheck($data, $view){
-		if (!isset($data['login']) || !isset($data['token'])){
-			self::showError($view, user::ERROR);
-			return;
-		}
-		$user = userFactory::getUserByLogin($data['login']);
-		if (!$user){
-			self::showError($view, user::ERROR);
-			return;
-		}
-		if ($user->changeLoginActivate($data['token']))
-			\Genesis\library\main\router::redirect(self::$changeLoginOk);
-		else 
-			self::showError($view, $user->getErrorMessage());
+		return $user;
 	}
 }

@@ -19,10 +19,14 @@ class controller {
 	}
 
 	function needPrivilage($privilage = 0){
-		if (auth::checkPrivilage($privilage))
+		if ($this->auth->checkPrivilage($privilage))
 			return TRUE;
 		router::redirect('', 'LOGIN');
 		return FALSE;
 	}
 	
 }
+
+// widok musi posiadać w sobie auth
+// kontroler musi posiadać skonfigurowany obiekt auth
+// w obiekcie auth trzba wpiąć obiekty wiadomości email

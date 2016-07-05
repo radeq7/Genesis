@@ -9,4 +9,4 @@ Logowanie
 	<br>
 	<input type="submit" value="Zaloguj" />
 </form>
-<a href="<?php echo auth::generateRemindLink()?>">Nie pamiętam hasła</a>
+<a href="<?php echo $this->auth->generateRemindLink()?>">Nie pamiętam hasła</a> 

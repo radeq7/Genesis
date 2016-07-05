@@ -17,4 +17,9 @@ class userFactory {
 		$user = user::load($id);
 		return $user;
 	}
+	
+	static function getNewUser(){
+		$user = new user();
+		return $user;
+	}
 }
