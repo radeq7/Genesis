@@ -11,8 +11,8 @@ class remindPass extends \Genesis\library\main\email\templateEmail {
 		$this->setReplace('{$userName}',  $recipient);
 		$this->setReplace('{$link}', $link);
 		$this->setReplace('{$siteEmail}', appConfig::getConfig('email'));
-		$this->setTemplateView(BASE_PATH . '/view/EmailTemplate/remindPass.html');
-		$this->setLayoutView(BASE_PATH . '/view/EmailTemplate/layoutEmail.html');
+		$this->setTemplateView(BASE_PATH . '/view/EmailTemplate/Auth/remindPass.html');
+		$this->setLayoutView(BASE_PATH . '/view/EmailTemplate/Auth/layoutEmail.html');
 		$this->setBodyText($this->getMessage());
 	}
 }

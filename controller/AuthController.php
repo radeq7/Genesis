@@ -3,6 +3,8 @@ use Genesis\library\main\auth\auth;
 class AuthController extends \Genesis\library\main\controller {
 	
 	function init(){	
+		$this->auth = $this->appResource->getResource('auth');
+		$this->view->auth = $this->auth;
 	}
 	
 	function indexAction() {

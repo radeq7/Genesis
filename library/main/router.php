@@ -97,12 +97,11 @@ class router {
 		$controller->end();
 	}
 	
-	static function redirect($redirect, $type=NULL) {
+	function redirect($redirect, $type=NULL) {
 		if ($type == 'LOGIN') {
 			$redirect = appConfig::getConfig('login_site');
 		}
-		application::end();
-		//$redirect = appConfig::getConfig('siteAdres') . $redirect;
+		application::getInstance()->end();
 		header('Location: '.$redirect);
 		exit();
 	}

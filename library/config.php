@@ -2,6 +2,9 @@
 namespace Genesis\library;
 use Genesis\library\main\appConfig;
 
+// tryb aplikacji
+const PRODUCTION = false;
+
 // adres strony
 appConfig::setConfig('siteAdres', 'my-site/EclipseWorkspace/GenesisFramework/');
 
