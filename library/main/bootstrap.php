@@ -43,4 +43,7 @@ class bootstrap{
 	protected function initUserFactory(){
 		return new \Genesis\library\main\auth\userFactory();
 	}
+	protected function initUrl(){
+		return new url();
+	}
 }
