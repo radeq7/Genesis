@@ -102,7 +102,7 @@ class router {
 			$redirect = appConfig::getConfig('login_site');
 		}
 		application::getInstance()->end();
-		header('Location: '.$redirect);
+		header('Location: '. application::getInstance()->getResource('url')->internalUrl($redirect));
 		exit();
 	}
 }
