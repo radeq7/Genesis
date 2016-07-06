@@ -40,4 +40,7 @@ class bootstrap{
 	protected function initObjectWatcher(){
 		return new objectWatcher();
 	}
+	protected function initUserFactory(){
+		return new \Genesis\library\main\auth\userFactory();
+	}
 }

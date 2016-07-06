@@ -1,5 +1,4 @@
 <?php
-use Genesis\library\main\auth\auth;
 class AuthController extends \Genesis\library\main\controller {
 	
 	function init(){	
