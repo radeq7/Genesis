@@ -5,9 +5,6 @@ use Genesis\library\main\appConfig;
 // tryb aplikacji
 const PRODUCTION = false;
 
-// adres strony
-appConfig::setConfig('siteAdres', 'my-site/EclipseWorkspace/GenesisFramework/');
-
 // tytuł aplikacji
 appConfig::setConfig('title', 'Genesis Framework');
 

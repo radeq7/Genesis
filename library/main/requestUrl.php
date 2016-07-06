@@ -10,7 +10,7 @@ class requestUrl extends request {
 	
 	protected function parse() {
 		$url = parse_url($_SERVER['REQUEST_URI']);
-		$siteAdres = appConfig::getConfig('siteAdres');
+		$siteAdres = SITE_ADRESS;
 		
 		// read url and remove white signs
 		$path = trim($url['path'], '/');
