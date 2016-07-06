@@ -35,7 +35,7 @@ class bootstrap{
 		return db::getPdo();
 	}
 	protected function initAuth(){
-		return new \Genesis\library\main\auth\auth();
+		return new \Genesis\library\main\auth\auth($this->getResource('userFactory'));
 	}
 	protected function initObjectWatcher(){
 		return new objectWatcher();
