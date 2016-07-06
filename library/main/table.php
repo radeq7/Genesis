@@ -18,15 +18,17 @@ abstract class table {
 	 * @var string
 	 */
 	protected $id_name = 'id';
+	protected $objectWatcher;
 	
 	function __construct($id=0){
 		$this->db_id = $id;
+		$this->objectWatcher = application::getInstance()->getResource('objectWatcher');
 	}
 	
 	static function load($id=0){
 		$object = new static($id);
 		if ($id) {
-			return objectWatcher::get_model($object);
+			return application::getInstance()->getResource('objectWatcher')->get_model($object);
 		}
 		else {
 			return $object;
@@ -48,21 +50,21 @@ abstract class table {
 	 * Oznacza obiekt do utworzenie nowego wiersza w tabeli bazy danych
 	 */
 	function markCreate(){
-		objectWatcher::add_new($this);
+		$this->objectWatcher->add_new($this);
 	}
 	
 	/**
 	 * Oznacza obiekt, aby nie został zaktualizowany w bazie danych
 	 */
 	function markClean(){
-		objectWatcher::clean($this);
+		$this->objectWatcher->clean($this);
 	}
 	
 	/**
 	 * Oznacza obiekt, aby został usunięty z bazy danych
 	 */
 	function markDelete(){
-		objectWatcher::add_delete($this);
+		$this->objectWatcher->add_delete($this);
 	}
 	
 	function get_name(){
@@ -95,8 +97,8 @@ abstract class table {
 	 */
 	protected function markSave(){
 		if ($this->db_id)
-			objectWatcher::add_dirty($this);
+			$this->objectWatcher->add_dirty($this);
 		else
-			objectWatcher::add_new($this);
+			$this->objectWatcher->add_new($this);
 	}
 }

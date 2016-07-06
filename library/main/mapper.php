@@ -14,7 +14,7 @@ class mapper {
 	 */
 	protected $pdo;
 	
-	protected function __construct(\PDO $pdo) {
+	function __construct(\PDO $pdo) {
 		$this->pdo = $pdo;
 	}
 	

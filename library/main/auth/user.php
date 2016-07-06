@@ -1,6 +1,7 @@
 <?php
 namespace Genesis\library\main\auth;
 use Genesis\library\main\appConfig;
+use Genesis\library\main\application;
 
 class user extends \Genesis\library\main\table{
 	const NOREGISTER = 0;
@@ -262,7 +263,7 @@ class user extends \Genesis\library\main\table{
 		return TRUE;
 	}
 	protected function checkLoginExist($login){
-		$user = userFactory::getUserByLogin($login);
+		$user = application::getInstance()->getResource('userFactory')->getUserByLogin($login);
 		if ($user)
 			return FALSE;
 		return TRUE;

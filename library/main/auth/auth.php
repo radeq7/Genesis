@@ -2,6 +2,8 @@
 namespace Genesis\library\main\auth;
 
 use Genesis\library\main\auth\email\activateUser;
+use Genesis\library\main\auth\email\remindPass;
+use Genesis\library\main\auth\email\changeLogin;
 class auth{
 	protected $userFactory;
 	protected $user = false;
@@ -19,7 +21,7 @@ class auth{
 	protected $changeLoginSendSite = 'changeLoginSend';
 	
 	function __construct(){
-		$this->userFactory = new userFactory();
+		$this->userFactory = \Genesis\library\main\application::getInstance()->getResource('userFactory');
 	}
 	function checkPrivilage($privilage = 0){
 		if ($this->isLogged() && $this->user->update())

@@ -1,6 +1,3 @@
-<?php
-use Genesis\library\main\auth\auth;
-?>
 Logowanie
 <form method="post">
 	<input type="text" value="" placeholder="Email" name="login" size="20" />

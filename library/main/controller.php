@@ -27,7 +27,6 @@ class controller {
 		if ($auth->checkPrivilage($privilage))
 			return TRUE;
 		$router->redirect('', 'LOGIN');
-		echo 'NIEZALOGOWANY';
 		return FALSE;
 	}
 	
