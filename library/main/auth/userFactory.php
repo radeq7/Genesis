@@ -2,7 +2,7 @@
 namespace Genesis\library\main\auth;
 
 class userFactory {
-	protected $userClassName = 'user';
+	protected $userClassName = 'Genesis\library\main\auth\user';
 	function getUserByLogin($login){
 		$mapper = \Genesis\library\main\application::getInstance()->getResource('mapper');
 		$where = sprintf("`login`='%s'", $login);

@@ -79,25 +79,25 @@ class auth{
 		return $link;
 	}	
 	function generateRemindLink(){
-		return $this->option['remindSite'];
+		return $this->options['remindSite'];
 	}	
 	function generateChangeLoginLink(){
 		$user = $this->getUser();
 		$url = application::getInstance()->getResource('url');
 		//$link = sprintf('%s?login=%s&token=%s', $this->changeLoginSite, $user->getEmail(), $user->generateChangeLoginToken());
-		$link = $url->internalUrl( $this->option['changeLoginSite'], '', array('login' => $user->getEmail(), 'token' => $user->generateChangeLoginToken()));
+		$link = $url->internalUrl( $this->options['changeLoginSite'], '', array('login' => $user->getEmail(), 'token' => $user->generateChangeLoginToken()));
 		return $link;
 	}	
 	function generateChangeLoginActivateLink($user){
 		$url = application::getInstance()->getResource('url');
 		//$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->changeLoginActivateSite, $user->getEmail(), $user->generateChangeLoginActivateToken());
-		$link = $url->externalUrl($this->option['changeLoginActivateSite'], '', array('login' => $user->getEmail(), 'token' => $user->generateChangeLoginActivateToken()));
+		$link = $url->externalUrl($this->options['changeLoginActivateSite'], '', array('login' => $user->getEmail(), 'token' => $user->generateChangeLoginActivateToken()));
 		return $link;
 	}
 	function generateChangePassLink($user){
 		$url = application::getInstance()->getResource('url');
 		//$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->changePassSite, $user->getEmail(), $user->getChangePassToken());
-		$link = $url->externalUrl($this->option['changePassSite'], '', array('login' => $user->getEmail(), 'token' => $user->getChangePassToken()));
+		$link = $url->externalUrl($this->options['changePassSite'], '', array('login' => $user->getEmail(), 'token' => $user->getChangePassToken()));
 		return $link;
 	}
 	
@@ -109,7 +109,7 @@ class auth{
 			if ($user->register()){
 				$activateMessage = new activateUser($user->getEmail(), $this->generateActivateLink($user));
 				$activateMessage->send();
-				$this->getRouter()->redirect($this->option['registerOkSite']);
+				$this->getRouter()->redirect($this->options['registerOkSite']);
 			}
 			else
 				$this->showError($view, $user->getErrorMessage());
@@ -122,7 +122,7 @@ class auth{
 			return;
 		
 		if ($user->activate($data['token']))
-			$this->getRouter()->redirect($this->option['activateOkSite']);
+			$this->getRouter()->redirect($this->options['activateOkSite']);
 	}	
 	function remind($view){
 		if (!isset($_POST['login']))
@@ -134,7 +134,7 @@ class auth{
 		if ($user->remindPass()){
 			$remindMessage = new remindPass($user->getEmail(), $this->generateChangePassLink($user));
 			$remindMessage->send();
-			$this->getRouter()->redirect($this->option['remindOkSite']);
+			$this->getRouter()->redirect($this->options['remindOkSite']);
 		}
 		else 
 			$this->showError($view, $user->getErrorMessage());
@@ -155,7 +155,7 @@ class auth{
 			return;
 		
 		if ($user->changePass($_POST['pass'], $data['token']))
-			$this->getRouter()->redirect($this->option['changePassOkSite']);
+			$this->getRouter()->redirect($this->options['changePassOkSite']);
 		else 
 			$this->showError($view, $user->getErrorMessage());
 	}	
@@ -173,7 +173,7 @@ class auth{
 		if ($user->changeLogin($_POST['login'], $data['token'])){
 			$changeLoginMessage = new changeLogin($user->getNewEmail(), $this->generateChangeLoginActivateLink($user));
 			$changeLoginMessage->send();
-			$this->getRouter()->redirect($this->option['changeLoginSendSite']);
+			$this->getRouter()->redirect($this->options['changeLoginSendSite']);
 		}
 		else
 			$this->showError($view, $user->getErrorMessage());
@@ -188,7 +188,7 @@ class auth{
 			return;
 		
 		if ($user->changeLoginActivate($data['token']))
-			$this->getRouter()->redirect($this->option['changeLoginOk']);
+			$this->getRouter()->redirect($this->options['changeLoginOk']);
 		else 
 			$this->showError($view, $user->getErrorMessage());
 	}

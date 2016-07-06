@@ -18,11 +18,11 @@ appConfig::setConfig('email', 'email@genesisframework.pl');
 appConfig::setConfig('error', true);
 
 // dane do domyślnego połączenia z bazą dancyh
-appConfig::setConfig('db_host', '');
-appConfig::setConfig('db_name', '');
-appConfig::setConfig('db_username', '');
-appConfig::setConfig('db_pass', '');
-appConfig::setConfig('db_charset', '');
+appConfig::setConfig('db_host', '23112.m.tld.pl');
+appConfig::setConfig('db_name', 'baza23112_system_genix3');
+appConfig::setConfig('db_username', 'admin23112_system_genix3');
+appConfig::setConfig('db_pass', 'cqBomu4ayG3UzMQslV6n');
+appConfig::setConfig('db_charset', 'utf8');
 
 // domyślna strona logowania
 appConfig::setConfig('login_site', 'index');
