@@ -19,6 +19,7 @@ class user extends \Genesis\library\main\table{
 	const ERROR_LOGIN_NOT_EXIST = 8;
 	const ERROR_LINK_EXPIRED = 9;
 	const ERROR_USER_NOT_ACTIVE = 10;
+	const ERROR_USER_IS_BAN = 11;
 	
 	protected $table_name = 'user';
 	protected $db_login = '';	// varchar255
@@ -36,6 +37,7 @@ class user extends \Genesis\library\main\table{
 	protected $db_changePassTime = '';	// datetime
 	protected $db_changeLogin = '';	// varchar255
 	protected $db_changeLoginTime = '';	// datetime
+	protected $db_loginWrong = 0; // tinyint
 	
 	protected $validateUserStrategy;
 	protected $errorMessage = FALSE;
@@ -45,18 +47,24 @@ class user extends \Genesis\library\main\table{
 		$this->validateUserStrategy = new userValidate();
 	}
 	function login($pass){
-		if ($this->db_state != self::ACTIVATE)
+		if ($this->db_state == self::BANNED)
+			$this->checkBanEnd();
+		if ($this->db_state != self::ACTIVATE){
+			if ($this->db_state != self::BANNED)
+				$this->errorMessage = self::ERROR_USER_NOT_ACTIVE;
 			return FALSE;
-			if ($this->db_pass != $this->generateHashPass($pass)){
-				$this->wrongLogin();
-				return FALSE;
-			}
-			$this->correctLogin();
-			return TRUE;
+		}
+		if ($this->db_pass != $this->generateHashPass($pass)){
+			$this->wrongLogin();
+			return FALSE;
+		}
+		$this->correctLogin();
+		return TRUE;
 	}
 	function ban($minutesBan){
 		$this->db_state = self::BANNED;
-		// zapamiętaj datę wygaśnięcia bana <----------------------------
+		$this->addBanTime($minutesBan);
+		$this->markSave();
 	}
 	function logout(){
 		$this->db_loginToken = '';
@@ -114,7 +122,7 @@ class user extends \Genesis\library\main\table{
 		}
 		
 		$this->db_changeLogin = $newLogin;
-		$this->db_changeLoginTime = $this->lateDate(); // dodaj 24h <----------------------------
+		$this->db_changeLoginTime = $this->datePlus24h();
 		$this->markSave();
 		return $this->generateChangeLoginActivateToken();
 	}
@@ -167,7 +175,7 @@ class user extends \Genesis\library\main\table{
 			return FALSE;
 		}
 		$this->db_changePassToken = $this->generateActivateToken();
-		$this->db_changePassTime = $this->nowDate(); // dodaj 24 godziny <----------------------------
+		$this->db_changePassTime = $this->datePlus24h();
 		$this->markSave();
 		return TRUE;
 	}
@@ -211,6 +219,9 @@ class user extends \Genesis\library\main\table{
 	function getChangePassToken(){
 		return $this->db_changePassToken;
 	}
+	function getBanTime(){
+		return $this->db_banTime;
+	}
 	protected function updateExpiredTime(){
 		$this->db_loginTimeExpired = $this->generateTimeExpired();
 		$this->markSave();
@@ -238,6 +249,7 @@ class user extends \Genesis\library\main\table{
 		$this->db_loginWrong++;
 		if ($this->db_loginWrong >= 5)
 			$this->ban(self::BANTIMEMINUTES);
+		$this->errorMessage = self::ERROR_WRONG_LOGIN_OR_PASS;
 		$this->markSave();
 	}
 	protected function checkTokenAndTime($token){
@@ -283,7 +295,23 @@ class user extends \Genesis\library\main\table{
 	protected function nowDate(){
 		return date("Y-m-d H:i:s");
 	}
-	protected function lateDate(){
-		return '2099-01-01 12:00:00';
+	protected function addBanTime($minute){
+		$time = new \Genesis\library\main\standard\time($this->nowDate());
+		$time->modifyMinute($minute);
+		$this->db_banTime = $time;
+	}
+	protected function datePlus24h(){
+		$time = new \Genesis\library\main\standard\time($this->nowDate());
+		$time->modifyHour(24);
+		return $time;
+	}
+	protected function checkBanEnd(){
+		if ($this->db_banTime < $this->nowDate()){
+			$this->db_state = self::ACTIVATE;
+			$this->db_banTime = '';
+			$this->db_loginWrong = 0;
+		}
+		else 
+			$this->errorMessage = self::ERROR_USER_IS_BAN;
 	}
 }

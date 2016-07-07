@@ -54,8 +54,10 @@ class auth{
 			$this->user = $user;
 			$this->getRouter()->redirect($this->options['loginSite']);
 		}
-		else
-			$this->showError($view, user::ERROR_WRONG_LOGIN_OR_PASS);
+		else {
+			$view->user = $user;
+			$this->showError($view, $user->getErrorMessage());
+		}
 	}
 	function logout(){
 		if ($this->isLogged())
@@ -229,6 +231,9 @@ class auth{
 				break;
 			case user::ERROR_USER_NOT_ACTIVE:
 				$view->add_view_before('Auth/Info/userNotActive.php');
+				break;
+			case user::ERROR_USER_IS_BAN:
+				$view->add_view_before('Auth/Info/userIsBan.php');
 				break;
 			default:
 		}
