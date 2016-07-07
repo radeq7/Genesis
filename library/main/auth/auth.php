@@ -16,6 +16,7 @@ class auth{
 			'changeLoginSite' => 'auth/changeLogin',
 			'changeLoginActivateSite' => 'auth/changeLoginCheck',
 			'registerOkSite' => 'auth/registerOk',
+			'registerSite' => 'auth/register',
 			'activateOkSite' => 'auth/activateOk',
 			'remindOkSite' => 'auth/remindOk',
 			'changePassOkSite' => 'auth/changePassOk',
@@ -72,6 +73,11 @@ class auth{
 			return $this->user->get_id();
 		return FALSE;
 	}	
+	function getRegisterLink(){
+		$url = application::getInstance()->getResource('url');
+		$link = $url->internalUrl($this->options['registerSite']);
+		return $link;
+	}
 	function generateActivateLink($user){
 		//$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->activateSite, $user->getEmail(), $user->getActivateToken());
 		$url = application::getInstance()->getResource('url');
