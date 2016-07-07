@@ -1,1 +1,0 @@
-<p style="color: red;">Nieprawidłowy adres Email!</p>

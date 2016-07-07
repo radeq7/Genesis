@@ -1,1 +1,0 @@
-Link potwierdzający zmianę loginu, został wysłany na nowy adres.

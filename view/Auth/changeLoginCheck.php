@@ -1,1 +1,0 @@
-Nie udało się zmienić Loginu!

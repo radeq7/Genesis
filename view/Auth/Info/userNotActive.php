@@ -1,1 +1,0 @@
-<p style="color: red;">Użytkownik nie jest aktywny!</p>

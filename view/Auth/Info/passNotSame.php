@@ -1,1 +1,0 @@
-<p style="color: red;">Podane hasła nie są takie same!</p>

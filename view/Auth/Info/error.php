@@ -1,1 +1,0 @@
-<p style="color: red;">Wystąpił błąd, podany link jest nieprawidłowy!</p>
