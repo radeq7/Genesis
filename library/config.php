@@ -32,3 +32,7 @@ const ADMIN = 1;
 
 // Ustawienie strefy czasowej dla aplikacji
 date_default_timezone_set('Europe/Warsaw');
+
+// Ustalanie tras
+$url = \Genesis\library\main\application::getInstance()->getResource('url');
+//$url->addSite('nazwaTrasy', 'adresWidoczny', 'controller', 'action');
