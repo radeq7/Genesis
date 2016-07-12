@@ -7,17 +7,16 @@ namespace Genesis\library\main;
  * @package Genesis
  */
 class request {
-	protected $default_controller_name;
-	protected $default_action_name;
-	protected $error_controller_name;
+	protected $default_controller_name = 'Index';
+	protected $default_action_name = 'index';
+	protected $error_controller_name = 'Error';
 	protected $controller_name = NULL;
 	protected $action_name = NULL;
 	protected $parameters = array();
+	protected $url;
 	
-	function __construct($default_controller_name = 'Index', $default_action_name = 'index', $error_controller_name = 'Error') {
-		$this->default_controller_name = $default_controller_name;
-		$this->default_action_name = $default_action_name;
-		$this->error_controller_name = $error_controller_name;
+	function __construct($url) {
+		$this->url = $url;
 		$this->parse();
 		if(empty($this->controller_name))
 			$this->controller_name = $this->default_controller_name;
@@ -26,7 +25,6 @@ class request {
 	}
 	
 	protected function parse() {
-
 	}
 	
 	function get_controller_name() {
@@ -52,7 +50,4 @@ class request {
 	function get_controller_path_by_name($controller_name) {
 		return BASE_PATH . '/controller/' . $controller_name . '.php';
 	}
-	
-
-	
 }
