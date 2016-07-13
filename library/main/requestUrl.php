@@ -15,24 +15,25 @@ class requestUrl extends request {
 		// read url and remove white signs
 		$path = trim($link['path'], '/');
 		
-		// remove 'index.php' and signs '/' in url
+		// remove 'index.php', signs '/' and siteAdres in url
 		$path = substr($path, strlen($siteAdres));
 		if (strpos($path, 'index.php') === 0)
 			$path = trim (substr($path, 9), '/');
 		
+		$this->request = $path;
 		
-		// sprawdź czy jest utworzony route
-		$route = $this->url->checkAdress($path);
-		if ($route){
-			$this->controller_name = ucfirst($route['controller']);
-			$this->action_name = $route['action'];
-			if (isset($link['query']))
-				$this->loadParameters($link['query']);
-			return TRUE;
-		}
-			
-		// podzielenie url na odpowiednie części i przypisanie do tablicy
-		$tablica = explode('/', $path);
+		// jeśli jest ustalona trasa wczytaj controller i action na podstawie trasy
+		if (!$this->checkRouteExist())
+			// wczytaj controller i action na podstawie request
+			$this->explodeRequest();
+		
+		// wczytaj parametry żądania
+		if (isset($link['query']))
+			$this->loadParameters($link['query']);
+	}
+	
+	protected function explodeRequest(){
+		$tablica = explode('/', $this->request);
 		// odczyt tablicy
 		if ($tablica[0] != '') {
 			$this->controller_name = ucfirst($tablica[0]);
@@ -40,10 +41,16 @@ class requestUrl extends request {
 				$this->action_name = $tablica[1];
 			}
 		}
-		
-		// read parameter
-		if (isset($link['query']))
-			$this->loadParameters($link['query']);
+	}
+	
+	protected function checkRouteExist(){
+		$route = $this->url->checkAdress($this->request);
+		if ($route){
+			$this->controller_name = ucfirst($route['controller']);
+			$this->action_name = $route['action'];
+			return TRUE;
+		}
+		return FALSE;
 	}
 	
 	protected function loadParameters($query){

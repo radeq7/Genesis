@@ -28,9 +28,9 @@ class url{
 	function addSite($siteName, $siteAdress, $controller, $action){
 		$this->sites[$siteName] = array('adress' => $siteAdress, 'controller' => $controller, 'action' => $action);
 	}
-	function link($site, $parameters){
+	function link($site, $parameters = array()){
 		if (isset($this->sites[$site]))
-			return generateLink($site, $parameters);
+			return $this->generateLink($site, $parameters);
 		return $site;
 	}
 	function checkAdress($adress){
@@ -40,7 +40,19 @@ class url{
 		}
 		return FALSE;
 	}
-	protected function generateLink($site){
+	function isActual($site){
+		$request = application::getInstance()->getResource('request');
+		if (isset($this->sites[$site])){
+			if ($this->sites[$site]['adress'] == $request->get_request())
+				return TRUE;
+		}
+		else{
+			if ($site == $request->get_request())
+				return TRUE;
+		}
+		return FALSE;
+	}
+	protected function generateLink($site, $parameters){
 		$link = $this->externalUrl($this->sites[$site]['adress'], '', $parameters);
 		return $link;
 	}

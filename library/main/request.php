@@ -13,6 +13,7 @@ class request {
 	protected $controller_name = NULL;
 	protected $action_name = NULL;
 	protected $parameters = array();
+	protected $request = null;
 	protected $url;
 	
 	function __construct($url) {
@@ -25,6 +26,13 @@ class request {
 	}
 	
 	protected function parse() {
+	}
+	
+	function getAction(){
+		return $this->action_name;
+	}
+	function getController(){
+		return $this->controller_name;
 	}
 	
 	function get_controller_name() {
@@ -49,5 +57,9 @@ class request {
 	
 	function get_controller_path_by_name($controller_name) {
 		return BASE_PATH . '/controller/' . $controller_name . '.php';
+	}
+	
+	function get_request(){
+		return $this->request;
 	}
 }
