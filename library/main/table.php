@@ -24,20 +24,17 @@ abstract class table {
 	 */
 	protected $objectWatcher;
 	
-	function __construct($id=0){
+	protected function __construct($id=0){
 		$this->db_id = $id;
 		$this->objectWatcher = application::getInstance()->getResource('objectWatcher');
-		$this->init();
 	}
 	
 	static function load($id=0){
 		$object = new static($id);
-		if ($id) {
-			return application::getInstance()->getResource('objectWatcher')->get_model($object);
-		}
-		else {
-			return $object;
-		}
+		if ($id) 
+			$object = application::getInstance()->getResource('objectWatcher')->get_model($object);
+		$object->init();
+		return $object;
 	}
 	
 	/**
