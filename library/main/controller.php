@@ -1,18 +1,16 @@
 <?php
 namespace Genesis\library\main;
-use Genesis\library\main\auth\auth;
 
 class controller {
+	protected $appResource = array();
 	protected $parameters = array();
 	protected $view;
-	public $auth = false;
 	
 	function __construct(array $parameters, view $view) {
+		$aplication = application::getInstance();
+		$this->appResource = $aplication->getResource();
 		$this->parameters = $parameters;
 		$this->view = $view;
-		
-		if (appConfig::getConfig('auth'))
-			$this->auth = new auth(db::getPdo(), appConfig::getConfig('option_auth'));
 	}
 	
 	function init(){
@@ -23,9 +21,12 @@ class controller {
 	}
 
 	function needPrivilage($privilage = 0){
-		if ($this->auth->checkPrivilage($privilage))
+		$auth = $this->appResource->getResource('auth');
+		$router = $this->appResource->getResource('router');
+		
+		if ($auth->checkPrivilage($privilage))
 			return TRUE;
-		router::redirect('', 'LOGIN');
+		$router->redirect('', 'LOGIN');
 		return FALSE;
 	}
 	

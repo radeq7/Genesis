@@ -8,41 +8,58 @@ namespace Genesis\library\main;
  * @package Genesis
  */
 class application {
-	function start() {
+	protected static $_instance = null;
+	protected $bootstrap;
+	
+	protected function __construct(){
+		// bootstrap
+		$this->bootstrap = new \Genesis\library\bootstrap();
+	}
+ 	static function getInstance(){
+        if (null === self::$_instance) {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
+    }
+	function run() {
 		$this->init();
-		$this->run();
+		$this->begin();
 		$this->end();
 	}
-	
-	function init() {
-		// uruchomienie sesji
-		session_start();
-		
+	function getResource($resource = null){
+		if ($resource === null)
+			return $this->bootstrap;
+		return $this->bootstrap->getResource($resource);
+	}
+	protected function init() {
 		// wczytanie konfiguracji aplikacji
 		require_once BASE_PATH . '/library/config.php';
 		
-		// WYŚWIETLANIE BŁĘDÓW
-		$this->error_switch(appConfig::getConfig('error'));
+		// TRYB pracy aplikacji
+		$this->mode(\Genesis\library\PRODUCTION);
+		
+		// uruchomienie sesji
+		session_start();
 	}
 	
-	function run() {
-		$request = new requestUrl();
+	protected function begin() {
+		$router = $this->getResource('router');
+		$request = $this->getResource('request');
 		
 		// uruchomienie routera z przekazanym obiektem request
-		$router = new router();
 		$router->run($request);
 	}
 	
-	static function end() {
-		objectWatcher::execute();
+	function end() {
+		$this->getResource('objectWatcher')->execute();
 	}
 	
-	function error_switch($error) {
-		if ($error){
+	protected function mode($isProduction) {
+		if ($isProduction)
+			ini_set('display_errors', '0');
+		else {
 			ini_set('display_errors', '1');
 			error_reporting(E_ALL);
 		}
-		else 
-			ini_set('display_errors', '0');
 	}
 }

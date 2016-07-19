@@ -1,10 +1,9 @@
 <?php
-
 class IndexController extends \Genesis\library\main\controller {
-	
-	function indexAction() {
+
+	function init(){
 	}
-	
-	function testAction() {
+
+	function indexAction() {
 	}
 }

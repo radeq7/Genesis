@@ -1,135 +1,260 @@
 <?php
 namespace Genesis\library\main\auth;
 
+use Genesis\library\main\auth\email\activateUser;
+use Genesis\library\main\auth\email\remindPass;
+use Genesis\library\main\auth\email\changeLogin;
+use Genesis\library\main\application;
 class auth{
-	protected $pdo;
-	protected $user;
-	protected $sessionLiveTime = 20;
+	protected $userFactory;
+	protected $user = false;
+	protected $options = array(
+			'loginSite' => 'auth/secret',
+			'activateSite' => 'auth/activate',
+			'remindSite' => 'auth/remindPass',
+			'changePassSite' => 'auth/changePass',
+			'changeLoginSite' => 'auth/changeLogin',
+			'changeLoginActivateSite' => 'auth/changeLoginCheck',
+			'registerOkSite' => 'auth/registerOk',
+			'registerSite' => 'auth/register',
+			'activateOkSite' => 'auth/activateOk',
+			'remindOkSite' => 'auth/remindOk',
+			'changePassOkSite' => 'auth/changePassOk',
+			'changeLoginOk' => 'auth/changeLoginOk',
+			'changeLoginSendSite' => 'auth/changeLoginSend'
+	);
 	
-	protected $userDbTableName = 'user';
-	protected $idDbName = 'id';
-	protected $emailDbName = 'login';
-	protected $passDbName = 'pass';
-	
-	protected $salt = '8h';
-	
-	function __construct($pdo, array $option = array()){
-		$this->pdo = $pdo;
-		if (isset($option['sessionLiveTime']))
-			$this->userDbTableName = $option['sessionLiveTime'];
-		if (isset($option['userDbTableName']))
-			$this->userDbTableName = $option['userDbTableName'];
-		if (isset($option['idDbName']))
-			$this->idDbName = $option['idDbName'];
-		if (isset($option['emailDbName']))
-			$this->emailDbName = $option['emailDbName'];
-		if (isset($option['passDbName']))
-			$this->passDbName = $option['passDbName'];
-		if (isset($option['salt']))
-			$this->salt = $option['salt'];
-		if (isset($_SESSION['auth_id']))
-			$this->user = user::load($_SESSION['auth_id']);
+	function __construct($userFactory, $options = array()){
+		$this->userFactory = $userFactory;
+		$this->loadOptions($options);
 	}
-	
-	/**
-	 * Zalogowuje usera
-	 */
-	function login($login, $pass){
-		$idUser = $this->getIdUser($login, $pass);
-		if ($idUser){
-			$this->user = user::load($idUser);
-			$this->user->login($this->generateToken(), $this->generateExpiredTime());
-			$_SESSION['auth_id'] = $idUser;
-			return TRUE;
-		}
-		$this->logout();
+	function checkPrivilage($privilage = 0){
+		if ($this->isLogged() && $this->user->update())
+			return $this->user->checkPrivilage($privilage);
 		return FALSE;
 	}
-	
-	/**
-	 * Wylogowuje usera
-	 */
-	function logout(){
-		if ($this->user){
-			$this->user->logout();
-			$this->user = FALSE;
-		}
-		unset ($_SESSION['auth_id']);
+	function isLogged(){
+		if (!isset($_SESSION['userId']) || !$_SESSION['userId'])
+			return FALSE;
+		if (!$this->user)
+			$this->user = $this->userFactory->getUserById($_SESSION['userId']);
+		if (!$this->user)
+			return FALSE;
 		return TRUE;
 	}
+	function login($view){
+		if (!isset($_POST['login']) || !isset($_POST['pass']))
+			return;
 	
-	/**
-	 * Sprawdza czy użytkownik jest zalogowany i posiada uprawnienia
-	 * Wartość 0 oznacza że nie potrzeba żadnych uprawnień, wystarczy zalogowany user
-	 * @return bool
-	 */
-	function checkPrivilage($privilage){
-		if ($this->user && $this->user->checkTokenAndTime($this->generateToken())){
-			$this->user->updateExpiredTime($this->generateExpiredTime());
-			if ($privilage == 0)
-				return TRUE;
-			return $this->user->checkPrivilage($privilage);
+		if (!$user = $this->loadUser($_POST['login'], user::ERROR_WRONG_LOGIN_OR_PASS, $view))
+			return;
+	
+		if ($user->login($_POST['pass'])){
+			$_SESSION['userId'] = $user->get_id();
+			$this->user = $user;
+			$this->getRouter()->redirect($this->options['loginSite']);
 		}
-		return FALSE;
+		else {
+			$view->user = $user;
+			$this->showError($view, $user->getErrorMessage());
+		}
 	}
-	
-	/**
-	 * Zwraca obiekt usera jeśli jest lub false
-	 */
+	function logout(){
+		if ($this->isLogged())
+			$this->user->logout();
+		$this->user = false;
+		$_SESSION['userId'] = 0;
+	}	
 	function getUser(){
-		if ($this->user)
+		if ($this->isLogged())
 			return $this->user;
 		return FALSE;
-	}
-	
-	/**
-	 * Zwraca id użytkownika jeśli zalogowany, lub false jeśli nie
-	 */
-	function getId(){
-		if ($this->user)
+	}	
+	function getIdUser(){
+		if ($this->isLogged())
 			return $this->user->get_id();
 		return FALSE;
+	}	
+	function getRegisterLink(){
+		$url = application::getInstance()->getResource('url');
+		$link = $url->internalUrl($this->options['registerSite']);
+		return $link;
+	}
+	function generateActivateLink($user){
+		//$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->activateSite, $user->getEmail(), $user->getActivateToken());
+		$url = application::getInstance()->getResource('url');
+		$link = $url->externalUrl($this->options['activateSite'], '', array('login' => $user->getEmail(), 'token' => $user->getActivateToken()));
+		return $link;
+	}	
+	function generateRemindLink(){
+		return $this->options['remindSite'];
+	}	
+	function generateChangeLoginLink(){
+		$user = $this->getUser();
+		$url = application::getInstance()->getResource('url');
+		//$link = sprintf('%s?login=%s&token=%s', $this->changeLoginSite, $user->getEmail(), $user->generateChangeLoginToken());
+		$link = $url->internalUrl( $this->options['changeLoginSite'], '', array('login' => $user->getEmail(), 'token' => $user->generateChangeLoginToken()));
+		return $link;
+	}	
+	function generateChangeLoginActivateLink($user){
+		$url = application::getInstance()->getResource('url');
+		//$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->changeLoginActivateSite, $user->getEmail(), $user->generateChangeLoginActivateToken());
+		$link = $url->externalUrl($this->options['changeLoginActivateSite'], '', array('login' => $user->getEmail(), 'token' => $user->generateChangeLoginActivateToken()));
+		return $link;
+	}
+	function generateChangePassLink($user){
+		$url = application::getInstance()->getResource('url');
+		//$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->changePassSite, $user->getEmail(), $user->getChangePassToken());
+		$link = $url->externalUrl($this->options['changePassSite'], '', array('login' => $user->getEmail(), 'token' => $user->getChangePassToken()));
+		return $link;
 	}
 	
-	/**
-	 * Generuje token
-	 */
-	protected function generateToken(){
-		return md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'] . $this->salt);
-	}
-	
-	/**
-	 * Generuje czas wygaśnięcia sesji
-	 */
-	protected function generateExpiredTime(){
-		$date = new \DateTime();
-		$timeChange = sprintf("PT%dM", $this->sessionLiveTime);
-		$date->add(new \DateInterval($timeChange));
-		return $date->format('Y-m-d H:i:s');
-	}
-	
-	/**
-	 * Hashuje i soli hasło
-	 */
-	protected function generateHash($pass){
-		return md5($pass . $this->salt);
-	}
-	
-	/**
-	 * Zwraca id użytkownika
-	 * Jeśli istnieje użytkonik o podanym loginie i haśle, zwraca jego id, jeśli nie zwraca false.
-	 */
-	protected function getIdUser($login, $pass){
-		$pass = $this->generateHash($pass);
-		$query = sprintf("SELECT %s FROM `%s` WHERE `%s`='%s' AND `%s`='%s'", $this->idDbName, $this->userDbTableName, $this->emailDbName, $login, $this->passDbName, $pass);
-		$result = $this->pdo->query($query);
-		if ($result == FALSE) {
-			$error_message = $this->pdo->errorInfo();
-			throw new \Exception($error_message[2]);
+	function register($view){
+		if (!isset($_POST['login']) || !isset($_POST['pass']))
+			return;
+			$user = $this->userFactory->getNewUser();
+			$user->createUser($_POST['login'], $_POST['pass']);
+			if ($user->register()){
+				$activateMessage = new activateUser($user->getEmail(), $this->generateActivateLink($user));
+				$activateMessage->send();
+				$this->getRouter()->redirect($this->options['registerOkSite']);
+			}
+			else
+				$this->showError($view, $user->getErrorMessage());
+	}	
+	function activate($data, $view){
+		if (!isset($data['login']) || !isset($data['token']))
+			return;
+		
+		if (!$user = $this->loadUser($data['login'], user::ERROR_INCORRECT_LOGIN, $view))
+			return;
+		
+		if ($user->activate($data['token']))
+			$this->getRouter()->redirect($this->options['activateOkSite']);
+	}	
+	function remind($view){
+		if (!isset($_POST['login']))
+			return;
+		
+		if (!$user = $this->loadUser($_POST['login'], user::ERROR_LOGIN_NOT_EXIST, $view))
+			return;
+		
+		if ($user->remindPass()){
+			$remindMessage = new remindPass($user->getEmail(), $this->generateChangePassLink($user));
+			$remindMessage->send();
+			$this->getRouter()->redirect($this->options['remindOkSite']);
 		}
-		$wynik = $result->fetchAll(\PDO::FETCH_ASSOC);
-		if (count($wynik))
-			return $wynik[0][$this->idDbName];
-		return false;	
+		else 
+			$this->showError($view, $user->getErrorMessage());
+	}	
+	function changePass($data, $view){
+		if (!isset($_POST['pass']) || !isset($_POST['pass2']))
+			return;
+		if (!isset($data['login']) || !isset($data['token'])){
+			$this->showError($view, user::ERROR);
+			return;
+		}
+		if ($_POST['pass'] != $_POST['pass2']){
+			$this->showError($view, user::ERROR_PASS_NOT_SAME);
+			return;
+		}
+		
+		if (!$user = $this->loadUser($data['login'], user::ERROR, $view))
+			return;
+		
+		if ($user->changePass($_POST['pass'], $data['token']))
+			$this->getRouter()->redirect($this->options['changePassOkSite']);
+		else 
+			$this->showError($view, $user->getErrorMessage());
+	}	
+	function changeLogin($data, $view){
+		if (!isset($_POST['login']))
+			return;
+		if (!isset($data['login']) || !isset($data['token'])){
+			$this->showError($view, user::ERROR);
+			return;
+		}
+		
+		if (!$user = $this->loadUser($data['login'], user::ERROR, $view))
+			return;
+		
+		if ($user->changeLogin($_POST['login'], $data['token'])){
+			$changeLoginMessage = new changeLogin($user->getNewEmail(), $this->generateChangeLoginActivateLink($user));
+			$changeLoginMessage->send();
+			$this->getRouter()->redirect($this->options['changeLoginSendSite']);
+		}
+		else
+			$this->showError($view, $user->getErrorMessage());
+	}	
+	function changeLoginCheck($data, $view){
+		if (!isset($data['login']) || !isset($data['token'])){
+			$this->showError($view, user::ERROR);
+			return;
+		}
+		
+		if (!$user = $this->loadUser($data['login'], user::ERROR, $view))
+			return;
+		
+		if ($user->changeLoginActivate($data['token']))
+			$this->getRouter()->redirect($this->options['changeLoginOk']);
+		else 
+			$this->showError($view, $user->getErrorMessage());
+	}
+	protected function showError($view, $errorNr){
+		switch($errorNr){
+			case user::ERROR:
+				$view->add_view_before('Auth/Info/error.php');
+				break;
+			case user::ERROR_INCORRECT_LOGIN:
+				$view->add_view_before('Auth/Info/incorrectLogin.php');
+				break;
+			case user::ERROR_INCORRECT_PASS:
+				$view->add_view_before('Auth/Info/incorrectPass.php');
+				break;
+			case user::ERROR_LOGIN_EXIST:
+				$view->add_view_before('Auth/Info/loginExist.php');
+				break;
+			case user::ERROR_LOGIN_NOT_EXIST:
+				$view->add_view_before('Auth/Info/loginNotExist.php');
+				break;
+			case user::ERROR_WRONG_LOGIN_OR_PASS:
+				$view->add_view_before('Auth/Info/wrongLoginOrPass.php');
+				break;
+			case user::ERROR_PASS_NOT_SAME:
+				$view->add_view_before('Auth/Info/passNotSame.php');
+				break;
+			case user::ERROR_INCORRECT_TOKEN:
+				$view->add_view_before('Auth/Info/incorrectToken.php');
+				break;
+			case user::ERROR_LINK_EXPIRED:
+				$view->add_view_before('Auth/Info/linkExpired.php');
+				break;
+			case user::ERROR_USER_NOT_ACTIVE:
+				$view->add_view_before('Auth/Info/userNotActive.php');
+				break;
+			case user::ERROR_USER_IS_BAN:
+				$view->add_view_before('Auth/Info/userIsBan.php');
+				break;
+			default:
+		}
+	}
+	protected function loadUser($login, $error, $view){
+		$user = $this->userFactory->getUserByLogin($login);
+		if (!$user){
+			$this->showError($view, $error);
+			return FALSE;
+		}
+		return $user;
+	}
+	protected function loadOptions($options){
+		foreach ($options as $key => $value){
+			if (isset($this->options[$key]))
+				$this->options[$key] = $value;
+		}
+	}
+	function getRouter(){
+		$application = \Genesis\library\main\application::getInstance();
+		return $application->getResource('router');
+	
 	}
 }

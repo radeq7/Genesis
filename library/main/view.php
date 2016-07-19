@@ -41,6 +41,10 @@ class view {
 		$this->views[] = $view;
 	}
 	
+	function add_view_before($view) {
+		array_unshift($this->views, $view);
+	}
+	
 	function clear_view(){
 		$this->views = array();
 	}
@@ -68,14 +72,30 @@ class view {
 	protected function render_layout() {
 		if (!$this->if_layout_render) {
 			$this->if_layout_render = true;
-			include BASE_PATH . '/view/' . $this->layout_name;
+			$filename = BASE_PATH . '/view/' . $this->layout_name;
+			$this->loadFile($filename);
 		}
 	}
 	
 	function render_views() {
 		foreach ($this->views as $view) {
-			include BASE_PATH . '/view/' . $view;
+			$filename = BASE_PATH . '/view/' . $view;
+			$this->loadFile($filename);
 		}
+	}
+	
+	protected function loadFile($filename){
+		if (file_exists($filename))
+			include $filename;
+		else
+			throw new \Exception("Brakuje pliku widoku o nazwie: {$filename}");
+	}
+	
+	/**
+	 * Zwraca obiekt url do generowania linków
+	 */
+	function getUrl(){
+		return application::getInstance()->getResource('url');
 	}
 	 
 }
