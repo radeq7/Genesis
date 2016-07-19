@@ -26,7 +26,7 @@ class bootstrap{
 		return new router();
 	}
 	protected function initRequest(){
-		return new requestUrl();
+		return new requestUrl($this->getResource('url'));
 	}
 	protected function initMapper(){
 		return new mapper($this->getResource('pdo'));

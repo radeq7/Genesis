@@ -16,6 +16,7 @@ class auth{
 			'changeLoginSite' => 'auth/changeLogin',
 			'changeLoginActivateSite' => 'auth/changeLoginCheck',
 			'registerOkSite' => 'auth/registerOk',
+			'registerSite' => 'auth/register',
 			'activateOkSite' => 'auth/activateOk',
 			'remindOkSite' => 'auth/remindOk',
 			'changePassOkSite' => 'auth/changePassOk',
@@ -53,8 +54,10 @@ class auth{
 			$this->user = $user;
 			$this->getRouter()->redirect($this->options['loginSite']);
 		}
-		else
-			$this->showError($view, user::ERROR_WRONG_LOGIN_OR_PASS);
+		else {
+			$view->user = $user;
+			$this->showError($view, $user->getErrorMessage());
+		}
 	}
 	function logout(){
 		if ($this->isLogged())
@@ -72,6 +75,11 @@ class auth{
 			return $this->user->get_id();
 		return FALSE;
 	}	
+	function getRegisterLink(){
+		$url = application::getInstance()->getResource('url');
+		$link = $url->internalUrl($this->options['registerSite']);
+		return $link;
+	}
 	function generateActivateLink($user){
 		//$link = sprintf('http://%s/%s?login=%s&token=%s', $_SERVER['SERVER_NAME'], $this->activateSite, $user->getEmail(), $user->getActivateToken());
 		$url = application::getInstance()->getResource('url');
@@ -223,6 +231,9 @@ class auth{
 				break;
 			case user::ERROR_USER_NOT_ACTIVE:
 				$view->add_view_before('Auth/Info/userNotActive.php');
+				break;
+			case user::ERROR_USER_IS_BAN:
+				$view->add_view_before('Auth/Info/userIsBan.php');
 				break;
 			default:
 		}

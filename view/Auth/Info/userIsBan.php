@@ -1,0 +1,1 @@
+<p style="color: red;">Użytkownik został zablokowany do <?php echo $this->user->getBanTime();?>!</p>

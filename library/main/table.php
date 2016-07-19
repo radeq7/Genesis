@@ -18,22 +18,29 @@ abstract class table {
 	 * @var string
 	 */
 	protected $id_name = 'id';
+	/**
+	 * Obserwuje obiekt
+	 * @var unknown
+	 */
 	protected $objectWatcher;
 	
-	function __construct($id=0){
+	protected function __construct($id=0){
 		$this->db_id = $id;
 		$this->objectWatcher = application::getInstance()->getResource('objectWatcher');
 	}
 	
 	static function load($id=0){
 		$object = new static($id);
-		if ($id) {
-			return application::getInstance()->getResource('objectWatcher')->get_model($object);
-		}
-		else {
-			return $object;
-		}
+		if ($id) 
+			$object = application::getInstance()->getResource('objectWatcher')->get_model($object);
+		$object->init();
+		return $object;
 	}
+	
+	/**
+	 * Zastępuje konstruktor do nadpisywania dla użytkownika
+	 */
+	function init(){}
 	
 	/**
 	 * Wczytuje zmienne z tablicy i przypisuje je do właściwości obiektu z prefiksem db_
@@ -67,14 +74,23 @@ abstract class table {
 		$this->objectWatcher->add_delete($this);
 	}
 	
+	/**
+	 * Zwraca nazwę tabeli
+	 */
 	function get_name(){
 		return $this->table_name;
 	}
 	
+	/**
+	 * Zwraca nazwę pola id w bazie danych
+	 */
 	function get_id_name(){
 		return $this->id_name;
 	}
 	
+	/**
+	 * Zwraca wartość pola id
+	 */
 	function get_id(){
 		return $this->db_id;
 	}

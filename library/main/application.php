@@ -11,7 +11,10 @@ class application {
 	protected static $_instance = null;
 	protected $bootstrap;
 	
-	protected function __construct(){}
+	protected function __construct(){
+		// bootstrap
+		$this->bootstrap = new \Genesis\library\bootstrap();
+	}
  	static function getInstance(){
         if (null === self::$_instance) {
             self::$_instance = new self();
@@ -34,9 +37,6 @@ class application {
 		
 		// TRYB pracy aplikacji
 		$this->mode(\Genesis\library\PRODUCTION);
-		
-		// bootstrap
-		$this->bootstrap = new \Genesis\library\bootstrap();
 		
 		// uruchomienie sesji
 		session_start();
