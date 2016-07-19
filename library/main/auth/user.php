@@ -42,8 +42,7 @@ class user extends \Genesis\library\main\table{
 	protected $validateUserStrategy;
 	protected $errorMessage = FALSE;
 
-	function __construct($id=0){
-		parent::__construct($id);
+	function init(){
 		$this->validateUserStrategy = new userValidate();
 	}
 	function login($pass){
@@ -91,10 +90,10 @@ class user extends \Genesis\library\main\table{
 	function activate($token){
 		if ($this->db_state != self::NOACTIVATE)
 			return FALSE;
-			if ($this->db_activateToken != $token)
-				return FALSE;
-				$this->activateUser();
-				return TRUE;
+		if ($this->db_activateToken != $token)
+			return FALSE;
+		$this->activateUser();
+		return TRUE;
 	}
 	function update(){
 		if ($this->db_loginToken == $this->generateLoginToken() && $this->db_loginTimeExpired > $this->nowDate()){
@@ -222,6 +221,7 @@ class user extends \Genesis\library\main\table{
 	function getBanTime(){
 		return $this->db_banTime;
 	}
+	function initActivate();
 	protected function updateExpiredTime(){
 		$this->db_loginTimeExpired = $this->generateTimeExpired();
 		$this->markSave();
@@ -229,6 +229,7 @@ class user extends \Genesis\library\main\table{
 	protected function activateUser(){
 		$this->db_state = self::ACTIVATE;
 		$this->db_activateToken = '';
+		$this->initActivate();
 		$this->markSave();
 	}
 	protected function registerUser(){

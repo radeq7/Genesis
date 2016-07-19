@@ -18,11 +18,16 @@ abstract class table {
 	 * @var string
 	 */
 	protected $id_name = 'id';
+	/**
+	 * Obserwuje obiekt
+	 * @var unknown
+	 */
 	protected $objectWatcher;
 	
 	function __construct($id=0){
 		$this->db_id = $id;
 		$this->objectWatcher = application::getInstance()->getResource('objectWatcher');
+		$this->init();
 	}
 	
 	static function load($id=0){
@@ -34,6 +39,11 @@ abstract class table {
 			return $object;
 		}
 	}
+	
+	/**
+	 * Zastępuje konstruktor do nadpisywania dla użytkownika
+	 */
+	function init(){}
 	
 	/**
 	 * Wczytuje zmienne z tablicy i przypisuje je do właściwości obiektu z prefiksem db_
