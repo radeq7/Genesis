@@ -74,14 +74,23 @@ abstract class table {
 		$this->objectWatcher->add_delete($this);
 	}
 	
+	/**
+	 * Zwraca nazwę tabeli
+	 */
 	function get_name(){
 		return $this->table_name;
 	}
 	
+	/**
+	 * Zwraca nazwę pola id w bazie danych
+	 */
 	function get_id_name(){
 		return $this->id_name;
 	}
 	
+	/**
+	 * Zwraca wartość pola id
+	 */
 	function get_id(){
 		return $this->db_id;
 	}

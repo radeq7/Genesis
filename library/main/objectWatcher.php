@@ -10,6 +10,11 @@ class objectWatcher {
 	protected $dirty = array();
 	protected $new = array();
 	protected $delete = array();
+	protected $mapper;
+	
+	function __construct(){
+		$this->mapper = application::getInstance()->getResource('mapper');
+	}
 	
 	/**
 	 * Dodaje do tabeli jako do aktualizacji
@@ -71,8 +76,7 @@ class objectWatcher {
 	 * @return table
 	 */
 	private function get_model_from_db(table $table){
-		$mapper = $this->getMapper();
-		$table->load_variable($mapper->load($table));
+		$table->load_variable($this->mapper->load($table));
 		$this->all[$this->generete_name($table)] = $table;
 		return $table;
 	}
@@ -92,18 +96,14 @@ class objectWatcher {
 	function execute() {
 		if(empty($this->new) && empty($this->dirty) && empty($this->delete))
 			return false;
-		$mapper = $this->getMapper();
 		foreach ($this->new as $table) {
-			$mapper->insert($table);
+			$this->mapper->insert($table);
 		}
 		foreach ($this->dirty as $table) {
-			$mapper->update($table);
+			$this->mapper->update($table);
 		}
 		foreach ($this->delete as $table) {
-			$mapper->delete($table);
+			$this->mapper->delete($table);
 		}
-	}
-	function getMapper(){
-		return application::getInstance()->getResource('mapper');
 	}
 }
