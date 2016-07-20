@@ -50,7 +50,7 @@ class auth{
 			return;
 	
 		if ($user->login($_POST['pass'])){
-			$_SESSION['userId'] = $user->get_id();
+			$_SESSION['userId'] = $user->getId();
 			$this->user = $user;
 			$this->getRouter()->redirect($this->options['loginSite']);
 		}

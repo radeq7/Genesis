@@ -1,5 +1,6 @@
 <?php
-namespace Genesis\library\main;
+namespace Genesis\library\main\db;
+use Genesis\library\main\appConfig;
 
 /**
  * Tworzy obiekt PDO

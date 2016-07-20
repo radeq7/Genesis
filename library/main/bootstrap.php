@@ -4,6 +4,8 @@ namespace Genesis\library\main;
 class bootstrap{
 	protected $resource = array();
 	
+	function init(){}
+	function end(){}
 	function getResource($resourceName = null){
 		if (!isset($this->resource[$resourceName]))
 			$this->initResource($resourceName);
@@ -28,17 +30,17 @@ class bootstrap{
 	protected function initRequest(){
 		return new requestUrl($this->getResource('url'));
 	}
+	protected function initDbAdapter(){
+		return new db\dbStandard($this->getResource('mapper'));
+	}
 	protected function initMapper(){
-		return new mapper($this->getResource('pdo'));
+		return new db\mapper($this->getResource('pdo'));
 	}
 	protected function initPdo(){
-		return db::getPdo();
+		return db\db::getPdo();
 	}
 	protected function initAuth(){
 		return new \Genesis\library\main\auth\auth($this->getResource('userFactory'));
-	}
-	protected function initObjectWatcher(){
-		return new objectWatcher();
 	}
 	protected function initUserFactory(){
 		return new \Genesis\library\main\auth\userFactory();

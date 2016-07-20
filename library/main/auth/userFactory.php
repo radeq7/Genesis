@@ -10,12 +10,14 @@ class userFactory {
 		if (empty($arrayUserId))
 			return FALSE;
 		$userId = current($arrayUserId);
-		$user = $this->userClassName::load($userId['id']);
+		$user = new $this->userClassName;
+		$user->load($userId['id']);
 		return $user;
 	}
 	
 	function getUserById($id){
-		$user = $this->userClassName::load($id);
+		$user = new $this->userClassName;
+		$user->load($id);
 		return $user;
 	}
 	
