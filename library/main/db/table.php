@@ -8,7 +8,7 @@ abstract class table{
 	protected $db_id = 0;
 	protected $adapter;
 	
-	final function __construct(){
+	function __construct(){
 		$this->adapter = application::getInstance()->getResource('dbAdapter');
 	}
 	function load($id){

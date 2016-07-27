@@ -52,7 +52,7 @@ class dbWatcher extends dbAdapter{
 			$this->mapper->update($update);
 		}
 		foreach ($this->create as $create){
-			$this->mapper->create($create);
+			$this->mapper->insert($create);
 		}
 		foreach ($this->delete as $delete){
 			$this->mapper->delete($delete);

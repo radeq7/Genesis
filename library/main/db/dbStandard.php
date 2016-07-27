@@ -9,7 +9,11 @@ class dbStandard extends dbAdapter{
 		return $this->mapper->loadCollection($table, $where);
 	}
 	function save(table $table){
-		$this->mapper->create($table);
+		if ($table->getId()){
+			$this->mapper->update($table);
+			return;
+		}
+		$this->mapper->insert($table);
 	}
 	function delete(table $table){
 		$this->mapper->delete($table);

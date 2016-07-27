@@ -18,7 +18,7 @@ class mapper{
 		$query = sprintf("DELETE FROM `%s` WHERE `%s`='%d' LIMIT 1", $table->getTableName(), $table->getIdName(), $table->getId());
 		$this->pdo_exec_or_error($query);;
 	}
-	function create(table $table){
+	function insert(table $table){
 		$query1 = '';
 		$query2 = '';
 		foreach ($table->getDbVar() as $key => $value) {
