@@ -16,7 +16,7 @@ appConfig::setConfig('db_host', '');
 appConfig::setConfig('db_name', '');
 appConfig::setConfig('db_username', '');
 appConfig::setConfig('db_pass', '');
-appConfig::setConfig('db_charset', '');
+appConfig::setConfig('db_charset', 'utf8');
 
 // domyślna strona logowania
 appConfig::setConfig('login_site', 'index');

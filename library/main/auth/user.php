@@ -3,7 +3,7 @@ namespace Genesis\library\main\auth;
 use Genesis\library\main\appConfig;
 use Genesis\library\main\application;
 
-class user extends \Genesis\library\main\table{
+class user extends \Genesis\library\main\db\table{
 	const NOREGISTER = 0;
 	const NOACTIVATE = 1;
 	const ACTIVATE = 2;
@@ -21,7 +21,7 @@ class user extends \Genesis\library\main\table{
 	const ERROR_USER_NOT_ACTIVE = 10;
 	const ERROR_USER_IS_BAN = 11;
 	
-	protected $table_name = 'user';
+	protected $tableName = 'user';
 	protected $db_login = '';	// varchar255
 	protected $db_pass = '';	// char32
 	protected $db_isLogged = 0;	// datetime
@@ -63,13 +63,13 @@ class user extends \Genesis\library\main\table{
 	function ban($minutesBan){
 		$this->db_state = self::BANNED;
 		$this->addBanTime($minutesBan);
-		$this->markSave();
+		$this->save();
 	}
 	function logout(){
 		$this->db_loginToken = '';
 		$this->db_loginTimeExpired = '0000-00-00 00:00:00';
 		$this->db_isLogged = 0;
-		$this->markSave();
+		$this->save();
 	}
 	function createUser($login, $pass){
 		if($this->db_state != self::NOREGISTER)
@@ -122,7 +122,7 @@ class user extends \Genesis\library\main\table{
 		
 		$this->db_changeLogin = $newLogin;
 		$this->db_changeLoginTime = $this->datePlus24h();
-		$this->markSave();
+		$this->save();
 		return $this->generateChangeLoginActivateToken();
 	}
 	/**
@@ -140,7 +140,7 @@ class user extends \Genesis\library\main\table{
 		$this->db_login = $this->db_changeLogin;
 		$this->db_changeLogin = '';
 		$this->db_changeLoginTime = '0000-00-00 00:00:00';
-		$this->markSave();
+		$this->save();
 		return TRUE;
 		
 	}
@@ -154,13 +154,13 @@ class user extends \Genesis\library\main\table{
 		$bit = new \Genesis\library\main\standard\bit($this->db_privilage);
 		$bit->setBit($privilage);
 		$this->db_privilage = $bit->getInt();
-		$this->markSave();
+		$this->save();
 	}
 	function removePrivilage($privilage){
 		$bit = new \Genesis\library\main\standard\bit($this->db_privilage);
 		$bit->removeBit($privilage);
 		$this->db_privilage = $bit->getInt();
-		$this->markSave();
+		$this->save();
 	}
 	function checkPrivilage($privilage){
 		if ($privilage == 0)
@@ -175,7 +175,7 @@ class user extends \Genesis\library\main\table{
 		}
 		$this->db_changePassToken = $this->generateActivateToken();
 		$this->db_changePassTime = $this->datePlus24h();
-		$this->markSave();
+		$this->save();
 		return TRUE;
 	}
 	function changePass($newPass, $token){
@@ -194,7 +194,7 @@ class user extends \Genesis\library\main\table{
 		$this->db_pass = $this->generateHashPass($newPass);
 		$this->db_changePassToken = '';
 		$this->db_changePassTime = '0000-00-00 00:00:00';
-		$this->markSave();
+		$this->save();
 		return TRUE;
 	}
 	function generateActivateToken(){
@@ -221,22 +221,22 @@ class user extends \Genesis\library\main\table{
 	function getBanTime(){
 		return $this->db_banTime;
 	}
-	function initActivate();
+	function initActivate(){}
 	protected function updateExpiredTime(){
 		$this->db_loginTimeExpired = $this->generateTimeExpired();
-		$this->markSave();
+		$this->save();
 	}
 	protected function activateUser(){
 		$this->db_state = self::ACTIVATE;
 		$this->db_activateToken = '';
 		$this->initActivate();
-		$this->markSave();
+		$this->save();
 	}
 	protected function registerUser(){
 		$this->db_state = self::NOACTIVATE;
 		$this->db_activateToken = $this->generateActivateToken();
 		$this->db_pass = $this->generateHashPass($this->db_pass);
-		$this->markSave();
+		$this->save();
 	}
 	protected function correctLogin() {
 		$this->db_loginToken = $this->generateLoginToken();
@@ -244,14 +244,14 @@ class user extends \Genesis\library\main\table{
 		$this->db_loginTimeExpired = $this->generateTimeExpired();
 		$this->db_loginWrong = 0;
 		$this->db_isLogged = true;
-		$this->markSave();
+		$this->save();
 	}
 	protected function wrongLogin(){
 		$this->db_loginWrong++;
 		if ($this->db_loginWrong >= 5)
 			$this->ban(self::BANTIMEMINUTES);
 		$this->errorMessage = self::ERROR_WRONG_LOGIN_OR_PASS;
-		$this->markSave();
+		$this->save();
 	}
 	protected function checkTokenAndTime($token){
 		if ($this->db_loginToken == $token && $this->db_loginTimeExpired > $this->nowDate()){

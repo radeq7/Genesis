@@ -40,6 +40,9 @@ class application {
 		
 		// uruchomienie sesji
 		session_start();
+		
+		// funkcje użytkownika
+		$this->bootstrap->init();
 	}
 	
 	protected function begin() {
@@ -51,7 +54,8 @@ class application {
 	}
 	
 	function end() {
-		$this->getResource('objectWatcher')->execute();
+		// funckcje użytkownika
+		$this->bootstrap->end();
 	}
 	
 	protected function mode($isProduction) {
