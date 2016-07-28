@@ -20,9 +20,11 @@ class dbWatcher extends dbAdapter{
 	protected $delete = array();
 
 	function load(table $table){
-		if (isset($this->bufor[$this->generateIdName($table)]))
+		if (isset($this->bufor[$this->generateIdName($table)])){
 			$table = $this->bufor[$this->generateIdName($table)];
-			$this->mapper->load($table);
+			return;
+		}
+		$this->mapper->load($table);
 	}
 	function loadCollection(table $table,string $where): array{
 		return $this->mapper->loadCollection($table, $where);

@@ -72,7 +72,7 @@ class auth{
 	}	
 	function getIdUser(){
 		if ($this->isLogged())
-			return $this->user->get_id();
+			return $this->user->getId();
 		return FALSE;
 	}	
 	function getRegisterLink(){
