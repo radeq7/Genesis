@@ -2,9 +2,6 @@
 namespace Genesis\library;
 use Genesis\library\main\appConfig;
 
-// tryb aplikacji
-const PRODUCTION = false;
-
 // tytuł aplikacji
 appConfig::setConfig('title', 'Genesis Framework');
 

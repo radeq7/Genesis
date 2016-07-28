@@ -17,5 +17,5 @@ try {
 	$application->run();
 }
 catch (\Exception $error) {
-	echo $error->getMessage();
+	echo 'EXCEPTION: '. $error->getMessage();
 }

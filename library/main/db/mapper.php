@@ -2,6 +2,7 @@
 namespace Genesis\library\main\db;
 
 class mapper{
+	protected $countQuery = 0;
 	protected $pdo;
 	function __construct(\PDO $pdo){
 		$this->pdo = $pdo;
@@ -33,9 +34,7 @@ class mapper{
 	}
 	function load(table $table){
 		$query = sprintf("SELECT * FROM `%s` WHERE `%s`='%d' LIMIT 1", $table->getTableName(), $table->getIdName(), $table->getId());
-		$result = $this->pdo->query($query);
-		if ($result == false)
-			throw new \Exception(print_r($this->pdo->errorInfo()));
+		$result = $this->pdo_query_or_error($query);
 		
 		if (!($wynik = $result->fetch(\PDO::FETCH_ASSOC)))
 			throw new \Exception(sprintf('Nie ma takiego rekordu (%s) w bazie danych!', $query));
@@ -55,18 +54,32 @@ class mapper{
 	}
 	function fetchAllAssoc($select, $table, $where){
 		$query = sprintf("SELECT %s FROM `%s` WHERE %s", $select, $table, $where);
-		$result = $this->pdo->query($query);
-		if ($result == FALSE) {
-			$error_message = $this->pdo->errorInfo();
-			throw new \Exception($error_message[2]);
-		}
+		$result = $this->pdo_query_or_error($query);
+
 		$wynik = $result->fetchAll(\PDO::FETCH_ASSOC);
 		return $wynik;
 	}
+	function getCountQuery(){
+		return $this->countQuery;
+	}
 	protected function pdo_exec_or_error($query){
+		$this->countQuery++;
 		if (!($this->pdo->exec($query))) {
 			$error = $this->pdo->errorInfo();
 			throw new \Exception($error[2]);
 		}
+	}
+	protected function pdo_query_or_error($query){
+		$result = $this->pdo->query($query);
+		
+		if ($result == false)
+			throw new \Exception(print_r($this->pdo->errorInfo()));
+		
+		if ($result == FALSE) {
+			$error_message = $this->pdo->errorInfo();
+			throw new \Exception($error_message[2]);
+		}
+		$this->countQuery++;
+		return $result;
 	}
 }

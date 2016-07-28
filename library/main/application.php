@@ -13,11 +13,11 @@ class application {
 	
 	protected function __construct(){
 		// bootstrap
-		$this->bootstrap = new \Genesis\library\bootstrap();
+		$this->bootstrap = new \Genesis\library\bootstrap();	
 	}
  	static function getInstance(){
         if (null === self::$_instance) {
-            self::$_instance = new self();
+            self::$_instance = new static();
         }
         return self::$_instance;
     }
@@ -34,9 +34,9 @@ class application {
 	protected function init() {
 		// wczytanie konfiguracji aplikacji
 		require_once BASE_PATH . '/library/config.php';
-		
+
 		// TRYB pracy aplikacji
-		$this->mode(\Genesis\library\PRODUCTION);
+		$this->mode();
 		
 		// uruchomienie sesji
 		session_start();
@@ -58,12 +58,7 @@ class application {
 		$this->bootstrap->end();
 	}
 	
-	protected function mode($isProduction) {
-		if ($isProduction)
-			ini_set('display_errors', '0');
-		else {
-			ini_set('display_errors', '1');
-			error_reporting(E_ALL);
-		}
+	protected function mode() {
+		ini_set('display_errors', '0');
 	}
 }
