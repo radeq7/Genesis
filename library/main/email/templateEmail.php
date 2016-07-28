@@ -39,7 +39,7 @@ class templateEmail extends email{
 	protected function generateMessage(){
 		$templateView = file_get_contents($this->templateView);
 		if ($templateView === FALSE)
-			throw new \Exception('Podany plik szablonu wiadomości email nie istnieje!');
+			throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' . 'Podany plik szablonu wiadomości email nie istnieje!');
 		$message = str_replace($this->search, $this->replace, $templateView);
 		return $message;
 	}
@@ -50,10 +50,10 @@ class templateEmail extends email{
 	protected function generateLayout(){
 		$templateView = file_get_contents($this->layoutView);
 		if ($templateView === FALSE)
-			throw new \Exception('Podany plik szablonu wiadomości email nie istnieje!');
+			throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' .'Podany plik szablonu wiadomości email nie istnieje!');
 		$message = str_replace('{$content}', $this->generateMessage(), $templateView, $count);
 		if ($count == 0)
-			throw new \Exception('W pliku layout wiadomości, nie ma znaków {$content} do zastąpienia wiadomości!');
+			throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' .'W pliku layout wiadomości, nie ma znaków {$content} do zastąpienia wiadomości!');
 		return $message;
 	}
 }

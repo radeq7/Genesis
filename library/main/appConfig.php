@@ -13,7 +13,7 @@ class appConfig {
 	static function getConfig($key) {
 		if (isset(self::$param[$key]))
 			return self::$param[$key];
-		throw new \Exception(sprintf('Klucz %s w appConfig nie istnieje!', $key));
+		throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' ."Klucz $key w appConfig nie istnieje!");
 	}
 
 	static function setConfig($key, $value) {

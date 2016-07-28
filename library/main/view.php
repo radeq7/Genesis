@@ -88,7 +88,7 @@ class view {
 		if (file_exists($filename))
 			include $filename;
 		else
-			throw new \Exception("Brakuje pliku widoku o nazwie: {$filename}");
+			throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' ."Brakuje pliku widoku o nazwie: {$filename}");
 	}
 	
 	/**

@@ -36,8 +36,10 @@ class mapper{
 		$query = sprintf("SELECT * FROM `%s` WHERE `%s`='%d' LIMIT 1", $table->getTableName(), $table->getIdName(), $table->getId());
 		$result = $this->pdo_query_or_error($query);
 		
-		if (!($wynik = $result->fetch(\PDO::FETCH_ASSOC)))
-			throw new \Exception(sprintf('Nie ma takiego rekordu (%s) w bazie danych!', $query));
+		if (!($wynik = $result->fetch(\PDO::FETCH_ASSOC))){
+			$error = '<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . "<br>Nie ma takiego rekordu ($query) w bazie danych!";
+			throw new \Exception($error);
+		}
 		
 		$table->setDbVar($wynik);
 	}
@@ -64,20 +66,19 @@ class mapper{
 	}
 	protected function pdo_exec_or_error($query){
 		$this->countQuery++;
-		if (!($this->pdo->exec($query))) {
-			$error = $this->pdo->errorInfo();
-			throw new \Exception($error[2]);
+		if ($this->pdo->exec($query) === FALSE) {
+			$errorArray = $this->pdo->errorInfo();
+			$error = '<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . "<br>Zapytanie: $query <br>" . $errorArray[2];
+			throw new \Exception($error);
 		}
 	}
 	protected function pdo_query_or_error($query){
 		$result = $this->pdo->query($query);
 		
-		if ($result == false)
-			throw new \Exception(print_r($this->pdo->errorInfo()));
-		
 		if ($result == FALSE) {
-			$error_message = $this->pdo->errorInfo();
-			throw new \Exception($error_message[2]);
+			$errorArray = $this->pdo->errorInfo();
+			$error = '<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' . $errorArray[2];
+			throw new \Exception($error);
 		}
 		$this->countQuery++;
 		return $result;

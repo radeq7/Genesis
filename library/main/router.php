@@ -25,7 +25,7 @@ class router {
 
 		// sprawdź czy klasa kontrolera istnieje w podanym pliku
 		if (!class_exists($controller_name, false))
-			throw new \Exception("Klasa kontrolera nie została zdefiniowana w pliku kontrolera!");
+			throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' ."Klasa kontrolera nie została zdefiniowana w pliku kontrolera!");
 		
 		// sprawdź czy akcja kontrolera istnieje i zwróć jej nazwę
 		$action_name = $this->get_action_name($controller_name, $request);
@@ -58,7 +58,7 @@ class router {
 			if (file_exists($request->get_controller_path_by_name($request->get_error_controller_name())))
 				$controller_name = $request->get_error_controller_name();
 			else
-				throw new \Exception("Kontroler błędu nie istnieje!");
+				throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' ."Kontroler błędu nie istnieje!");
 		}
 		return $controller_name;
 	}
@@ -71,7 +71,7 @@ class router {
 			if (method_exists($controller_name, $request->get_default_action_name()))
 				$action_name = $request->get_default_action_name();
 			else
-				throw new \Exception("Domyślna akcja kontrolera: '$controller_name' nie istnieje!");
+				throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' ."Domyślna akcja kontrolera: '$controller_name' nie istnieje!");
 		}
 		return $action_name;
 	}
