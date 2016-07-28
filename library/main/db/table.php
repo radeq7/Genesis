@@ -11,12 +11,18 @@ abstract class table{
 	function __construct(){
 		$this->adapter = application::getInstance()->getResource('dbAdapter');
 	}
+	function __initLoad(){}
 	function load($id){
 		$this->db_id = $id;
 		$this->adapter->load($this);
+		$this->__initLoad();
 	}
 	function loadCollection($where){
-		return $this->adapter->loadCollection($this, $where);
+		$collection = $this->adapter->loadCollection($this, $where);
+		foreach ($collection as $element){
+			$element->__initLoad();
+		}
+		return $collection;
 	}
 	function save(){
 		$this->adapter->save($this);
