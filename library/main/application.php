@@ -52,7 +52,12 @@ class application {
 		// uruchomienie routera z przekazanym obiektem request
 		$router->run($request);
 	}
-	
+	function errorReaction(\Exception $error){
+		$message = $error->getMessage();
+		$log = new \Genesis\library\main\standard\log('log\error.html');
+		$log->logMessage($log->formatMessage($message));
+		echo '<P class="error">WYSTĄPIŁ BŁĄD !</P>';
+	}
 	function end() {
 		// funckcje użytkownika
 		$this->bootstrap->end();

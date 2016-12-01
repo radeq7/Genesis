@@ -6,3 +6,8 @@ html {
 	color: #ffffff;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
 }
+
+.error {
+	color: red;
+	font-weight: bold;
+}

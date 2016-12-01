@@ -10,6 +10,9 @@ class applicationDevelopment extends \Genesis\library\main\application{
 		$this->start = microtime();	
 		parent::init();
 	}
+	function errorReaction(\Exception $error){
+		echo 'EXCEPTION: '. $error->getMessage();
+	}
 	function end(){
 		
 		parent::end();
@@ -27,5 +30,4 @@ class applicationDevelopment extends \Genesis\library\main\application{
 		ini_set('display_errors', '1');
 		error_reporting(E_ALL);
 	}
-	
 }
