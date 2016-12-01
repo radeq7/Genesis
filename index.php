@@ -13,7 +13,7 @@ require_once BASE_PATH . '/library/main/autoloader.php';
 
 // uruchomienie aplikacji
 try {
-	$application = \Genesis\library\main\application::getInstance();
+	$application = \Genesis\library\main\applicationDevelopment::getInstance();
 	$application->run();
 }
 catch (\Exception $error) {

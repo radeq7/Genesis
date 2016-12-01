@@ -5,6 +5,9 @@ class applicationDevelopment extends \Genesis\library\main\application{
 	protected $start;
 	protected $end;
 	
+	protected function __construct(){
+		$this->bootstrap = new \Genesis\library\bootstrap();
+	}
 	protected function init(){
 		// start time
 		$this->start = microtime();	
