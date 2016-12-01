@@ -29,6 +29,9 @@ class dbWatcher extends dbAdapter{
 	function loadCollection(table $table,string $where): array{
 		return $this->mapper->loadCollection($table, $where);
 	}
+	function loadCollectionByType($where, $typeSellection){
+		return $this->mapper->loadCollectionByType($where, $typeSellection);
+	}
 	function save(table $table){
 		if ($table->getId()){
 			$this->update[$this->generateIdName($table)] = $table;
