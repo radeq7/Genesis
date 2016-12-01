@@ -24,6 +24,13 @@ abstract class table{
 		}
 		return $collection;
 	}
+	function loadCollectionByType($where, $typeSellection){
+		$collection = $this->adapter->loadCollectionByType($where, $typeSellection);
+		foreach ($collection as $element){
+			$element->__initLoad();
+		}
+		return $collection;
+	}
 	function save(){
 		$this->adapter->save($this);
 	}

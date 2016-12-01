@@ -54,6 +54,17 @@ class mapper{
 		}
 		return $collection;
 	}
+	function loadCollectionByType($where, $typeSellection){
+		$collection = array();
+		$data = $this->fetchAllAssoc('*', $typeSellection->getTableName(), $where);
+		foreach ($data as $element){
+			$className = $typeSellection->getObjectNameByType($element[$typeSellection->getTypeName()]);
+			$newObject = new $className;
+			$newObject->setDbVar($element);
+			$collection[] = $newObject;
+		}
+		return $collection;
+	}
 	function fetchAllAssoc($select, $table, $where){
 		$query = sprintf("SELECT %s FROM `%s` WHERE %s", $select, $table, $where);
 		$result = $this->pdo_query_or_error($query);
