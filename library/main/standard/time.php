@@ -3,11 +3,15 @@ namespace Genesis\library\main\standard;
 
 class time{
 	protected $date;
-	function __construct($time = 0){
-		if ($time == 0)
+	function __construct($time = null){
+		if ($time == null)
 			$this->date = new \DateTime();
-		else 
+		elseif(is_string($time)) 
 			$this->date = new \DateTime($time);
+		elseif(is_a($time, '\DateTime'))
+			$this->date = $time;
+		else 
+			throw new \Exception(sprintf('Nieprawidłowy parametr typu: (%s) w tworzeniu obiektu time!', gettype($time)));
 	}
 	function __toString(){
 		return $this->date->format('Y-m-d H:i:s');
