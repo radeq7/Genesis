@@ -31,7 +31,7 @@ class router {
 		$action_name = $this->get_action_name($controller_name, $request);
 				
 		// utworzenie widoku
-		$view = $this->create_view($controller_name, $action_name);
+		$view = $request->getView($controller_name, $action_name);
 		
 		// utworzenie obiektu controller
 		$controller = $this->create_controller($controller_name, $request->get_parameters(), $view);
@@ -79,12 +79,6 @@ class router {
 	protected function create_controller($controller_name, $paremeters, $view_name) {
 		$controller = new $controller_name($paremeters, $view_name);
 		return $controller;
-	}
-	
-	protected function create_view($controller_name, $action_name) {
-		$view_name = substr($controller_name, 0, -10) . '/' . substr($action_name, 0, -6) . '.php';  
-		$view = new view($view_name);
-		return $view;
 	}
 	
 	protected function load_controller_file($controller_path) {

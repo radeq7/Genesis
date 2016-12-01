@@ -28,6 +28,8 @@ class bootstrap{
 		return new router();
 	}
 	protected function initRequest(){
+		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')
+			return new requestAjax($this->getResource('url'));
 		return new requestUrl($this->getResource('url'));
 	}
 	protected function initDbAdapter(){

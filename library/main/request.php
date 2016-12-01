@@ -62,4 +62,10 @@ class request {
 	function get_request(){
 		return $this->request;
 	}
+	
+	function getView($controller_name, $action_name){
+		$view_name = substr($controller_name, 0, -10) . '/' . substr($action_name, 0, -6) . '.php';
+		$view = new view($view_name);
+		return $view;
+	}
 }
