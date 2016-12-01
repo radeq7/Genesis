@@ -24,7 +24,7 @@ abstract class table{
 		}
 		return $collection;
 	}
-	function loadCollectionByType($where, $typeSellection){
+	function loadCollectionByType($where, tableType $typeSellection){
 		$collection = $this->adapter->loadCollectionByType($where, $typeSellection);
 		foreach ($collection as $element){
 			$element->__initLoad();
