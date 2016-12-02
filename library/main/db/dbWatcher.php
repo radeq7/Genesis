@@ -24,13 +24,17 @@ class dbWatcher extends dbAdapter{
 			$table = $this->bufor[$this->generateIdName($table)];
 			return;
 		}
-		$this->mapper->load($table);
+		$this->bufor[$this->generateIdName($table)] = $this->mapper->load($table);
 	}
 	function loadCollection(table $table,string $where): array{
-		return $this->mapper->loadCollection($table, $where);
+		$collection = $this->mapper->loadCollection($table, $where);
+		$collection = $this->buforCollection($collection);
+		return $collection;
 	}
 	function loadCollectionByType($where, $typeSellection){
-		return $this->mapper->loadCollectionByType($where, $typeSellection);
+		$collection = $this->mapper->loadCollectionByType($where, $typeSellection);
+		$collection = $this->buforCollection($collection);
+		return $collection;
 	}
 	function save(table $table){
 		if ($table->getId()){
@@ -65,6 +69,18 @@ class dbWatcher extends dbAdapter{
 		$this->update = array();
 		$this->create = array();
 		$this->delete = array();
+	}
+	protected function buforCollection($collection){
+		$newCollection = array();
+		foreach ($collection as $table){
+			if (isset($this->bufor[$this->generateIdName($table)]))
+				$newCollection[] = $this->bufor[$this->generateIdName($table)];
+			else {
+				$this->bufor[$this->generateIdName($table)] = $table;
+				$newCollection[] = $table;
+			}
+		}
+		return $newCollection;
 	}
 	protected function generateIdName(table $table){
 		return sprintf('%s%d', $table->getTableName(), $table->getId());

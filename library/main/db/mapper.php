@@ -42,6 +42,7 @@ class mapper{
 		}
 		
 		$table->setDbVar($wynik);
+		return $table;
 	}
 	function loadCollection(table $table, $where){
 		$collection = array();

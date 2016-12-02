@@ -9,7 +9,7 @@ class tableType extends table{
 	function getObjectNameByType($type){
 		if (isset($this->type[$type]))
 			return $this->type[$type];
-			throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' ."Nie zdefiniowany podtyp objektu");
+			throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' ."Nie zdefiniowany podtyp objektu [{$type}]");
 	}
 	function getTypeName(){
 		return $this->typeName;
