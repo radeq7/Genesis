@@ -12,7 +12,7 @@ class mapperDevelopment extends mapper{
 		return $result;
 	}
 	protected function logQuery($query){
-		$log = new \Genesis\library\main\standard\log('log\query.html');
+		$log = new \Genesis\library\main\standard\log('log/query.html');
 		$log->logMessage($log->formatMessage(sprintf(" [ %s ] ", $query)));
 	}
 }
