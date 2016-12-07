@@ -43,6 +43,13 @@ class dbWatcher extends dbAdapter{
 		}
 		$this->create[] = $table;
 	}
+	function saveNow(table $table){
+		if ($table->getId()){
+			$this->mapper->update($table);
+			return;
+		}
+		$this->mapper->insert($table);
+	}
 	function delete(table $table){
 		$this->delete[$this->generateIdName($table)] = $table;
 	}

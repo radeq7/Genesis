@@ -34,6 +34,9 @@ abstract class table{
 	function save(){
 		$this->adapter->save($this);
 	}
+	function saveNow(){
+		$this->adapter->saveNow($this);
+	}
 	function delete(){
 		$this->adapter->delete($this);
 	}

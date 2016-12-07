@@ -18,6 +18,9 @@ class dbStandard extends dbAdapter{
 		}
 		$this->mapper->insert($table);
 	}
+	function saveNow(table $table){
+		$this->save($table);
+	}
 	function delete(table $table){
 		$this->mapper->delete($table);
 	}
