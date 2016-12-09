@@ -68,7 +68,12 @@ class view {
 	function change_layout($layout_name) {
 		$this->layout_name = $layout_name;
 	}
-	
+	/**
+	 * Zwraca obiekt url do generowania linków
+	 */
+	function getUrl(){
+		return application::getInstance()->getResource('url');
+	}
 	protected function render_layout() {
 		if (!$this->if_layout_render) {
 			$this->if_layout_render = true;
@@ -77,7 +82,7 @@ class view {
 		}
 	}
 	
-	function render_views() {
+	protected function render_views() {
 		foreach ($this->views as $view) {
 			$filename = BASE_PATH . '/view/' . $view;
 			$this->loadFile($filename);
@@ -89,13 +94,5 @@ class view {
 			include $filename;
 		else
 			throw new \Exception('<br>Plik: ' . __FILE__ . '<br>Linia: ' . __LINE__ . '<br>' ."Brakuje pliku widoku o nazwie: {$filename}");
-	}
-	
-	/**
-	 * Zwraca obiekt url do generowania linków
-	 */
-	function getUrl(){
-		return application::getInstance()->getResource('url');
-	}
-	 
+	}	 
 }
