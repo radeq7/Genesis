@@ -1,7 +1,7 @@
 <?php
 namespace Genesis\library\main;
 
-class controller {
+abstract class controller {
 	protected $appResource = array();
 	protected $parameters = array();
 	protected $view;
@@ -12,14 +12,13 @@ class controller {
 		$this->parameters = $parameters;
 		$this->view = $view;
 	}
-	
 	function init(){
 	}
-	
+	function indexAction(){
+	}
 	function end(){
 		$this->view->auto_render_view();
 	}
-
 	function needPrivilage($privilage = 0){
 		$auth = $this->appResource->getResource('auth');
 		$router = $this->appResource->getResource('router');

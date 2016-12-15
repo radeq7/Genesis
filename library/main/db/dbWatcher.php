@@ -11,10 +11,6 @@ class dbWatcher extends dbAdapter{
 	 */
 	protected $update = array();
 	/**
-	 * Rekordy do utworzenia
-	 */
-	protected $create = array();
-	/**
 	 * Rekordy do skasowania
 	 */
 	protected $delete = array();
@@ -41,13 +37,9 @@ class dbWatcher extends dbAdapter{
 			$this->update[$this->generateIdName($table)] = $table;
 			return TRUE;
 		}
-		$this->create[] = $table;
+		$this->insert($table);
 	}
-	function saveNow(table $table){
-		if ($table->getId()){
-			$this->mapper->update($table);
-			return;
-		}
+	function insert(table $table){
 		$this->mapper->insert($table);
 	}
 	function delete(table $table){
@@ -56,25 +48,15 @@ class dbWatcher extends dbAdapter{
 	function clean(table $table){
 		unset($this->delete[$this->generateIdName($table)]);
 		unset($this->update[$this->generateIdName($table)]);
-		$new_array = array();
-		foreach ($this->create as $new) {
-			if ($new != $table)
-				$new_array[] = $new;
-		}
-		$this->new = $new_array;
 	}
 	function exec(){
 		foreach ($this->update as $update){
 			$this->mapper->update($update);
 		}
-		foreach ($this->create as $create){
-			$this->mapper->insert($create);
-		}
 		foreach ($this->delete as $delete){
 			$this->mapper->delete($delete);
 		}
 		$this->update = array();
-		$this->create = array();
 		$this->delete = array();
 	}
 	protected function buforCollection($collection){
