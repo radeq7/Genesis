@@ -23,9 +23,9 @@ class requestUrl extends request {
 		$this->request = $path;
 		
 		// jeśli jest ustalona trasa wczytaj controller i action na podstawie trasy
-		if (!$this->checkRouteExist())
-			// wczytaj controller i action na podstawie request
-			$this->explodeRequest();
+		$this->checkRouteExist();
+		// wczytaj controller i action na podstawie request
+		$this->explodeRequest();
 		
 		// wczytaj parametry żądania
 		if (isset($link['query']))
@@ -44,10 +44,9 @@ class requestUrl extends request {
 	}
 	
 	protected function checkRouteExist(){
-		$route = $this->url->checkAdress($this->request);
+		$route = $this->url->checkRoute($this->request);
 		if ($route){
-			$this->controller_name = ucfirst($route['controller']);
-			$this->action_name = $route['action'];
+			$this->request = $route;
 			return TRUE;
 		}
 		return FALSE;
