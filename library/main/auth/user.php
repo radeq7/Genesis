@@ -42,7 +42,7 @@ class user extends \Genesis\library\main\db\table{
 	protected $validateUserStrategy;
 	protected $errorMessage = FALSE;
 
-	function init(){
+	function __construct(){
 		$this->validateUserStrategy = new userValidate();
 	}
 	function login($pass){
@@ -237,7 +237,9 @@ class user extends \Genesis\library\main\db\table{
 		$this->db_activateToken = $this->generateActivateToken();
 		$this->db_pass = $this->generateHashPass($this->db_pass);
 		$this->save();
+		$this->doRegister();
 	}
+	protected function doRegister(){} 
 	protected function correctLogin() {
 		$this->db_loginToken = $this->generateLoginToken();
 		$this->db_loginTime = $this->nowDate();
