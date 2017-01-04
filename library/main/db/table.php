@@ -8,34 +8,37 @@ abstract class table{
 	protected $db_id = 0;
 	protected $adapter;
 	
-	function __construct(){
+	function setAdapter($adapter){
+		$this->adapter = $adapter;
+	}
+	function loadDefaultAdapter(){
 		$this->adapter = application::getInstance()->getResource('dbAdapter');
 	}
 	function __initLoad(){}
 	function load($id){
 		$this->db_id = $id;
-		$this->adapter->load($this);
+		$this->getAdapter()->load($this);
 		$this->__initLoad();
 	}
 	function loadCollection($where){
-		$collection = $this->adapter->loadCollection($this, $where);
+		$collection = $this->getAdapter()->loadCollection($this, $where);
 		foreach ($collection as $element){
 			$element->__initLoad();
 		}
 		return $collection;
 	}
 	function loadCollectionByType($where, tableType $typeSellection){
-		$collection = $this->adapter->loadCollectionByType($where, $typeSellection);
+		$collection = $this->getAdapter()->loadCollectionByType($where, $typeSellection);
 		foreach ($collection as $element){
 			$element->__initLoad();
 		}
 		return $collection;
 	}
 	function save(){
-		$this->adapter->save($this);
+		$this->getAdapter()->save($this);
 	}
 	function delete(){
-		$this->adapter->delete($this);
+		$this->getAdapter()->delete($this);
 	}
 	function setId($id){
 		$this->db_id = $id;
@@ -62,5 +65,10 @@ abstract class table{
 	}
 	function getTableName(){
 		return $this->tableName;
+	}
+	protected function getAdapter(){
+		if (!$this->adapter)
+			$this->loadDefaultAdapter();
+			return $this->adapter;
 	}
 }
