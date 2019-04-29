@@ -6,7 +6,7 @@ class applicationDevelopment extends \Genesis\library\main\application{
 	protected $end;
 	
 	protected function __construct(){
-		$this->bootstrap = new \Genesis\library\bootstrap();
+		$this->bootstrap = new \Genesis\library\main\bootstrapDevelopment();
 	}
 	protected function init(){
 		// start time
