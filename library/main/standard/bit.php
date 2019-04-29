@@ -60,7 +60,7 @@ class bit{
 			case 8:
 				return bit::BIT8;
 			default:
-				throw new Exception();
+				throw new \Exception();
 		}
 	}
 }
