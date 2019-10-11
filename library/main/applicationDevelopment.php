@@ -23,7 +23,7 @@ class applicationDevelopment extends \Genesis\library\main\application{
 		
 		// podsumowanie aplikacji w trybie testowym
 		echo '<p>Liczba zapytań do bazy danych: ' . $this->getResource('mapper')->getCountQuery() . '</p>';
-		$time = $this->end - $this->start;
+		$time = (double)$this->end - (double)$this->start;
 		$time = sprintf("%1.3f", $time);
 		echo '<p>Czas wykonywanie skryptu: ' . $time .  's</p>';
 		$memory = (int) (memory_get_usage() / 1024);
