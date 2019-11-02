@@ -1,14 +1,14 @@
 <?php
-class checkbox extends element{
-    protected $header = '%s<input type="checkbox"%s/>';
+class radio extends element{
+    protected $header = '%s<input type="radio"%s/>';
     
     protected function doRender(): string
     {
         return sprintf( $this->header, "\t", $this->renderAttributes() );
-    }
+    } 
     
     function setDefault( $default ){
-        if ( $default == ( $this->value ?? 'on' ))
+        if ( $default == $this->value )
             $this->checked();
     }
 }

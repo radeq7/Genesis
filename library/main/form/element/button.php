@@ -1,6 +1,8 @@
 <?php
-namespace \Genesis\library\main\form\element;
-
 class button extends element{
-	protected $format = '<input type="button" name="%s"%s/>';
+    protected $header = "\t" . '<button type="button"%s>%s</button>';
+    
+    protected function doRender(): string{
+        return sprintf($this->header, $this->renderAttributes(), $this->value ?? $this->name);
+    }
 }
