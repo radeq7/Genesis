@@ -1,4 +1,7 @@
 <?php
+namespace Genesis\library\main\form\element;
+use Genesis\library\main\form\element;
+
 class submit extends element{
     protected $header = "\t" . '<button type="submit"%s>%s</button>' . "\n";
     

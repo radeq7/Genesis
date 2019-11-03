@@ -1,4 +1,7 @@
 <?php
+namespace Genesis\library\main\form\element;
+use Genesis\library\main\form\element;
+
 class text extends element{
     protected $type;
     protected $header = '%s<input%s%s/>';

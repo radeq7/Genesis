@@ -1,4 +1,7 @@
 <?php
+namespace Genesis\library\main\form\element;
+use Genesis\library\main\form\element;
+
 class checkbox extends element{
     protected $header = '%s<input type="checkbox"%s/>';
     

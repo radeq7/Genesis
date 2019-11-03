@@ -1,4 +1,6 @@
 <?php
+namespace Genesis\library\main\form\element;
+
 class textarea extends text{
     protected $rows;
     protected $cols;

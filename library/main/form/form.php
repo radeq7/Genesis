@@ -1,12 +1,23 @@
 <?php
-class form{
+namespace Genesis\library\main\form;
+use Genesis\library\main\form\element\button;
+use Genesis\library\main\form\element\checkbox;
+use Genesis\library\main\form\element\radio;
+use Genesis\library\main\form\element\select;
+use Genesis\library\main\form\element\submit;
+use Genesis\library\main\form\element\text;
+use Genesis\library\main\form\element\textarea;
+use Genesis\library\main\form\element\range;
+use Genesis\library\main\form\element\number;
+
+class form extends html{
     protected $method = 'post';
     protected $action;
     protected $defaultValue = array();
     protected $autocomplete = NULL;
     protected $target = NULL;
     protected $openTag = '<form method="%s" action="%s"%s%s>';
-    protected $closeTag = '</form>';
+    protected $closeTag = "\r\n" . '</form>' . "\r\n";
     protected $elementList = array();
     
     function __construct( string $action, array $defaultValue = array() ){
@@ -68,24 +79,41 @@ class form{
         return $element;
     }
     
-    function autocompleteOff(): void{
+    function addRange( string $name, $value = NULL ): range{
+        $element = new range( $name, $value );
+        $this->addElement($element);
+        return $element;
+    }
+    
+    function addNumber( string $name, $value = NULL ): number{
+        $element = new number( $name, $value );
+        $this->addElement($element);
+        return $element;
+    }
+    
+    function autocompleteOff(): form{
         $this->autocomplete = false;
+        return $this;
     }
     
-    function autocompleteOn(): void{
+    function autocompleteOn(): form{
         $this->autocomplete = true;
+        return $this;
     }
     
-    function setMethodGet(): void{
+    function setMethodGet(): form{
         $this->method = 'get';
+        return $this;
     }
     
-    function setMethodPost(): void{
+    function setMethodPost(): form{
         $this->method = 'post';
+        return $this;
     }
     
-    function setTarget( string $target ): void{
+    function setTarget( string $target ): form{
         $this->target = $target;
+        return $this;
     }
     
     function __toString(){

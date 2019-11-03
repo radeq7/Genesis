@@ -1,4 +1,7 @@
 <?php
+namespace Genesis\library\main\form\element;
+use Genesis\library\main\form\element;
+
 class button extends element{
     protected $header = "\t" . '<button type="button"%s>%s</button>';
     

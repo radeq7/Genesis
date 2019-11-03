@@ -1,4 +1,7 @@
 <?php
+namespace Genesis\library\main\form\element;
+use Genesis\library\main\form\element;
+
 class select extends element{
     protected $header = "\t" . '<select%s>' . "\n";
     protected $footer = "\t</select>";

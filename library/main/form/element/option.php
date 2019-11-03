@@ -1,5 +1,8 @@
 <?php
-class option{
+namespace Genesis\library\main\form\element;
+use Genesis\library\main\form\html;
+
+class option extends html{
     protected $value;
     protected $label;
     protected $selected = false;

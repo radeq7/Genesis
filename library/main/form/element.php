@@ -1,15 +1,13 @@
 <?php
-abstract class element{
+namespace Genesis\library\main\form;
+
+abstract class element extends html{
     protected $name;
-    protected $id;
     protected $value = NULL;
     protected $disabled = false;
     protected $checked = false;    
     protected $placeholder = '';
-    protected $label = '';    
-    protected $class;
-    protected $style;
-    protected $title;
+    protected $label = '';        
     
     function __construct( string $name, $value=NULL ){
         $this->name = $name;
@@ -28,12 +26,7 @@ abstract class element{
         $this->value = $value;
         return $this;
     }
-    
-    function setId( string $id ): element{
-        $this->id = $id;
-        return $this;
-    }
-    
+        
     function disabled(): element{
         $this->disabled = true;
         return $this;
@@ -52,36 +45,20 @@ abstract class element{
     function setLabel( string $label ): element{
         $this->label = $label;
         return $this;
-    }
-    
-    function setClass( string $class ): element{
-        $this->class = $class;
-        return $this;
-    }
-    
-    function setStyle( string $style ): element{
-        $this->style = $style;
-        return $this;
-    }
-    
-    function setTitle( string $title ): element{
-        $this->title = $title;
-        return $this;
-    }
+    } 
     
     function getName(){
         return $this->name;
     }
     
     protected function renderAttributes(): string{                
-        return sprintf('%s%s%s%s%s%s%s%s', $this->renderName(), 
-                                           $this->renderValue(), 
-                                           $this->renderClass(), 
-                                           $this->renderDisabled(), 
-                                           $this->renderChecked(), 
-                                           $this->renderPlaceholder(),
-                                           $this->renderStyle(),
-                                           $this->renderTitle());
+        return sprintf('%s%s%s%s%s%s',
+            $this->renderHTML(),
+            $this->renderName(), 
+            $this->renderValue(),                                           
+            $this->renderDisabled(), 
+            $this->renderChecked(), 
+            $this->renderPlaceholder());
     }
     
     protected function renderLabel(): string{
@@ -117,24 +94,6 @@ abstract class element{
     protected function renderDisabled(): string{
         if ( $this->disabled )
             return ' disabled';
-        return '';
-    }
-    
-    protected function renderClass(): string{
-        if ( $this->class )
-            return sprintf(' class="%s"', $this->class);
-        return '';
-    }
-    
-    protected function renderStyle(): string{
-        if ( $this->style )
-            return sprintf(' style="%s"', $this->style);
-        return '';
-    }
-    
-    protected function renderTitle(): string{
-        if ( $this->title )
-            return sprintf(' title="%s"', $this->title);
         return '';
     }
 }
