@@ -36,10 +36,10 @@ class url{
 		}
 		return FALSE;
 	}
-	function isActual($site){
+	function isActual($site){	 
 		$request = application::getInstance()->getResource('request');
 		if (isset($this->routes[$site])){
-			if ($this->routes[$site]['adress'] == $request->get_request())
+		    if ($this->routes[$site]['controller'].'/'.$this->routes[$site]['action'] == $request->get_request())
 				return TRUE;
 		}
 		else{
