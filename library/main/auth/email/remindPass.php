@@ -6,7 +6,7 @@ class remindPass extends \Genesis\library\main\email\templateEmail {
 	function __construct($recipient, $link){
 		$this->setSubject('Przypomnij hasło');
 		$this->addTo($recipient);
-		$this->setFrom('system@genix3.com', 'Genix3');
+		$this->setFrom(appConfig::getConfig('email'), appConfig::getConfig('title'));
 		$this->setReplace('{$siteName}', appConfig::getConfig('title'));
 		$this->setReplace('{$userName}',  $recipient);
 		$this->setReplace('{$link}', $link);
