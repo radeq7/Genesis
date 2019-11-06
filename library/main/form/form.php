@@ -19,6 +19,7 @@ class form extends html{
     protected $openTag = '<form method="%s" action="%s"%s%s>';
     protected $closeTag = "\r\n" . '</form>' . "\r\n";
     protected $elementList = array();
+    protected $errors = array();
     
     function __construct( string $action, array $defaultValue = array() ){
         $this->action = $action;
@@ -132,20 +133,39 @@ class form extends html{
         return $this->elementList;
     }
     
-    protected function renderHeader(): string{
+    function renderHeader(): string{
         return sprintf($this->openTag, $this->method, $this->action, $this->renderAutocomplete(), $this->renderTarget());
+    }
+    
+    function renderFooter(): string{
+        return $this->closeTag;
+    }
+    
+    function setErrors( array $errors ){
+        $this->errors = $errors;
+    }
+    
+    function setDefaultData( array $defaultValue ){
+        $this->defaultValue = $defaultValue;
+        foreach ( $this->elementList as $element ){
+            if ( isset ($this->defaultValue[$element->getName()]) )
+                $element->setDefault( $this->defaultValue[$element->getName()] );
+        }
     }
     
     protected function renderBody(): string{
         $body = '';
         foreach ( $this->elementList as $element ){
+            $body .= $this->renderError( $element );
             $body .= $element->render();
         }
         return $body;
     }
     
-    protected function renderFooter(): string{
-        return $this->closeTag;
+    protected function renderError( element $element ): string{
+        if ( isset( $this->errors[$element->getName()] ) )
+            return $this->errors[$element->getName()];
+        return '';
     }
     
     protected function renderAutocomplete(): string{

@@ -1,7 +1,7 @@
 <?php
-namespace Genesis\library\main\standard\validator;
+namespace Genesis\library\main\form\validator;
 
-class stringValidate extends aValidator{
+class stringValidate extends aValidate{
     protected $maxLength;
     protected $minLength;
     
@@ -22,13 +22,15 @@ class stringValidate extends aValidator{
         return true;
     }
     
-    function setMaxLength( int $maxLength, string $errorMessage ) {
+    function setMaxLength( int $maxLength, string $errorMessage ): stringValidate {
         $this->maxLength = $maxLength;
         $this->errorList['maxLength'] = $errorMessage;
+        return $this;
     }
     
-    function setMinLength( int $minLength, string $errorMessage){
+    function setMinLength( int $minLength, string $errorMessage): stringValidate{
         $this->minLength = $minLength;
         $this->errorList['minLength'] = $errorMessage;
+        return $this;
     }
 }

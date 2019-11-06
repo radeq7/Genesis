@@ -1,7 +1,7 @@
 <?php
-namespace Genesis\library\main\standard\validator;
+namespace Genesis\library\main\form\validator;
 
-class boolValidate extends aValidator{
+class boolValidate extends aValidate{
     function doValidate( $value ): bool{
         
         if ( !is_bool( $value )){

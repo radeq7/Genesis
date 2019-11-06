@@ -4,6 +4,7 @@ namespace Genesis\library\main\form\element;
 class textarea extends text{
     protected $rows;
     protected $cols;
+    protected $wrap;
     protected $header = '%s<textarea%s%s>';
     protected $footer = '%s</textarea>';
     

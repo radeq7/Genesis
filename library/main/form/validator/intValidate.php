@@ -1,13 +1,13 @@
 <?php
-namespace Genesis\library\main\standard\validator;
+namespace Genesis\library\main\form\validator;
 
-class intValidate extends aValidator{
+class intValidate extends aValidate{
     protected $min;
     protected $max;
     
     function doValidate( $value ): bool{
         
-        if ( !is_int( $value )){
+        if ( !is_numeric( $value )){
             $this->setDefaultError();
             return false;
         }
@@ -22,13 +22,15 @@ class intValidate extends aValidator{
         return true;
     }
     
-    function setMin( int $min, string $errorMessage ){
+    function setMin( int $min, string $errorMessage ): intValidate{
         $this->min = $min;
         $this->errorList['min'] = $errorMessage;
+        return $this;
     }
     
-    function setMax ( int $max, string $errorMessage ){
+    function setMax ( int $max, string $errorMessage ): intValidate{
         $this->max = $max;
         $this->errorList['max'] = $errorMessage;
+        return $this;
     }
 }

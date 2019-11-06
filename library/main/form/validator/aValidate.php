@@ -1,7 +1,7 @@
 <?php
-namespace Genesis\library\main\standard\validator;
+namespace Genesis\library\main\form\validator;
 
-abstract class aValidator{
+abstract class aValidate{
     protected $name;
     protected $error = false;
     protected $errorList = array();
@@ -20,6 +20,10 @@ abstract class aValidator{
         return $this->error;
     }
     
+    function getName(): string{
+        return $this->name;
+    }
+    
     protected function setDefaultError(){
         $this->setError('default');
     }
@@ -31,4 +35,6 @@ abstract class aValidator{
     protected function resetError(){
         $this->error = false;
     }
+    
+    abstract function doValidate( $value ): bool;
 }

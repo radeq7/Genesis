@@ -17,6 +17,7 @@ class select extends element{
     
     function setDefault( $default ){
         $this->default = $default;
+        $this->checkDefault();
     }
     
     protected function doRender(): string{
