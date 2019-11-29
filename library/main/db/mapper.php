@@ -7,6 +7,10 @@ class mapper{
 	function __construct(\PDO $pdo){
 		$this->pdo = $pdo;
 	}
+	function query($query){
+	    $result = $this->pdo_query_or_error($query);
+	    return $result->fetchAll(\PDO::FETCH_ASSOC);
+	}
 	function update(table $table){
 		$query1 = '';
 		foreach ($table->getDbVar() as $key => $value) {
